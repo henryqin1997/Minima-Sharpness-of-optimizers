@@ -179,7 +179,7 @@ def training_loop(model, criterion, optimizer, train_loader, valid_loader, epoch
                   f'Train accuracy: {100 * train_acc:.2f}\t'
                   f'Valid accuracy: {100 * valid_acc:.2f}')
 
-    plot_losses(train_losses, valid_losses)
+    #plot_losses(train_losses, valid_losses)
 
     return model, optimizer, (train_losses, valid_losses)
 
