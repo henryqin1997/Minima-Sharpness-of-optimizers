@@ -20,9 +20,9 @@ elif sys.argv[1]=='sgdwm':
 elif sys.argv[1] == 'rmsprop':
     optimizer = optim.RMSprop(model.parameters(),lr=0.1, momentum=0.9)
 elif sys.argv[1] == 'adagrad':
-    optimizer = optim.Adagrad(model.parameters(), lr=0.01, lr_decay=0.99, weight_decay=0.9, initial_accumulator_value=0, eps=1e-10)
+    optimizer = optim.Adagrad(model.parameters(), lr=0.01)
 elif sys.argv[1] == 'radam':
-    optimizer = RAdam(model.parameters(), lr=0.001, mom=0.9, sqr_mom=0.99, eps=1e-05, wd=0.0, beta=0.0, decouple_wd=True)
+    optimizer = RAdam(model.parameters())
 elif sys.argv[1] == 'lars':#no tensorboardX
     optimizer = LARS(model.parameters(), lr=0.1, momentum=0.9)
 elif sys.argv[1] == 'lamb':
