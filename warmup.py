@@ -13,7 +13,7 @@ if len(sys.argv)==1:
 elif sys.argv[1]=='adam':
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 elif sys.argv[1]=='sgd':
-    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.SGD(model.parameters(), lr=0.01)
 elif sys.argv[1]=='sgdwm':
     optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 elif sys.argv[1] == 'rmsprop':
@@ -33,7 +33,7 @@ elif sys.argv[1] == 'adagrad':
 #     exit(0)
 
 else:
-    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.SGD(model.parameters(), lr=0.01)
 
 optname = sys.argv[1] if len(sys.argv)>=2 else 'sgd'
 
