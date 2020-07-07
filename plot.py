@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import json
 
-name_list = ['sgd','sgdwm','rmsprop','adagrad','adam','radam','lars','lamb','novograd']
+name_list = ['sgd','sgdwm','adagrad','adam','radam','lars','lamb','novograd']
 
 for name in name_list:
     file = open('loss/'+name+'_loss.txt','r')

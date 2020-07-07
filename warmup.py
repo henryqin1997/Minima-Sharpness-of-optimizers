@@ -18,7 +18,7 @@ elif sys.argv[1]=='sgd':
 elif sys.argv[1]=='sgdwm':
     optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 elif sys.argv[1] == 'rmsprop':
-    optimizer = optim.RMSprop(model.parameters(),lr=0.01, momentum=0.9)
+    optimizer = optim.RMSprop(model.parameters(),lr=0.001, momentum=0.9)
 elif sys.argv[1] == 'adagrad':
     optimizer = optim.Adagrad(model.parameters(), lr=0.01)
 elif sys.argv[1] == 'radam':
