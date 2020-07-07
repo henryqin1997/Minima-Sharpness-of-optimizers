@@ -1,1 +1,0 @@
-14:49:00 --- Epoch: 0	Train loss: 2.3036	Valid loss: 2.3033	Train accuracy: 9.87	Valid accuracy: 9.8014:49:45 --- Epoch: 1	Train loss: 2.3036	Valid loss: 2.3033	Train accuracy: 9.87	Valid accuracy: 9.8014:50:30 --- Epoch: 2	Train loss: 2.3036	Valid loss: 2.3033	Train accuracy: 9.87	Valid accuracy: 9.80
