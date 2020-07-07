@@ -146,7 +146,7 @@ def get_accuracy(model, data_loader, device):
     return correct_pred.float() / n
 
 
-def training_loop(model, criterion, optimizer, train_loader, valid_loader, epochs, device, print_every=1):
+def training_loop(model, criterion, optimizer, train_loader, valid_loader, epochs, device, log, print_every=1):
     '''
     Function defining the entire training loop
     '''
@@ -172,12 +172,12 @@ def training_loop(model, criterion, optimizer, train_loader, valid_loader, epoch
             train_acc = get_accuracy(model, train_loader, device=device)
             valid_acc = get_accuracy(model, valid_loader, device=device)
 
-            print(f'{datetime.now().time().replace(microsecond=0)} --- '
+            log.write(f'{datetime.now().time().replace(microsecond=0)} --- '
                   f'Epoch: {epoch}\t'
                   f'Train loss: {train_loss:.4f}\t'
                   f'Valid loss: {valid_loss:.4f}\t'
                   f'Train accuracy: {100 * train_acc:.2f}\t'
-                  f'Valid accuracy: {100 * valid_acc:.2f}')
+                  f'Valid accuracy: {100 * valid_acc:.2f}\n')
 
     #plot_losses(train_losses, valid_losses)
 

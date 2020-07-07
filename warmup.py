@@ -9,7 +9,7 @@ import json
 model = LeNet5(N_CLASSES).to(DEVICE)
 
 if len(sys.argv)==1:
-    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.SGD(model.parameters(), lr=0.01)
 elif sys.argv[1]=='adam':
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 elif sys.argv[1]=='sgd':
@@ -37,9 +37,11 @@ else:
 
 optname = sys.argv[1] if len(sys.argv)>=2 else 'sgd'
 
+log = open(optname+'log.txt','w+')
+
 criterion = nn.CrossEntropyLoss()
 
-model, optimizer, _ = training_loop(model, criterion, optimizer, train_loader, valid_loader, N_EPOCHS, DEVICE)
+model, optimizer, _ = training_loop(model, criterion, optimizer, train_loader, valid_loader, N_EPOCHS, DEVICE,log)
 
 with open(optname+'_loss.txt','w+') as myfile:
     json.dump(_,myfile)
