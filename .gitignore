@@ -1,4 +1,3 @@
 mnist_data/
 .idea/
 __pycache__/
-*_loss.txt
