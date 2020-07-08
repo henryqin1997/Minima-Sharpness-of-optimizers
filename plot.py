@@ -1,7 +1,8 @@
 from matplotlib import pyplot as plt
+import re
 import json
 
-name_list = ['sgd','sgdwm','adagrad','adam','radam','lars','lamb','novograd']
+name_list = ['sgd','sgdwm','rmsprop','adagrad','adam','radam','lars','lamb','novograd']
 
 for name in name_list:
     file = open('loss/'+name+'_loss.txt','r')
@@ -11,5 +12,17 @@ for name in name_list:
 
 plt.xlabel('epoch')
 plt.ylabel('loss')
+plt.legend()
+plt.show()
+
+for name in name_list:
+    file = open('log/'+name+'log.txt','r')
+    valid_acc = []
+    for line in file:
+        valid_acc.append(float(line[-6:]))
+    plt.plot(valid_acc,label = name)
+
+plt.xlabel('epoch')
+plt.ylabel('valid accuracy')
 plt.legend()
 plt.show()
