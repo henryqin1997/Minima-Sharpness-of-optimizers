@@ -47,12 +47,12 @@ def training_loop(model, criterion, train_loader, valid_loader, epochs, device, 
             valid_acc = get_accuracy(model, valid_loader, device=device)
             train_accuracy.append(train_acc)
             valid_accuracy.append(valid_acc)
-            print(f'{datetime.now().time().replace(microsecond=0)} --- '
-                  f'Epoch: {epoch}\t'
-                  f'Train loss: {train_loss:.4f}\t'
-                  f'Valid loss: {valid_loss:.4f}\t'
-                  f'Train accuracy: {100 * train_acc:.2f}\t'
-                  f'Valid accuracy: {100 * valid_acc:.2f}\n')
+            print('{datetime.now().time().replace(microsecond=0)} --- ',
+                  'Epoch: {epoch}\t',
+                  'Train loss: {train_loss:.4f}\t',
+                  'Valid loss: {valid_loss:.4f}\t',
+                  'Train accuracy: {100 * train_acc:.2f}\t',
+                  'Valid accuracy: {100 * valid_acc:.2f}\n')
 
     #plot_losses(train_losses, valid_losses)
 
