@@ -11,7 +11,7 @@ model = LeNet5(N_CLASSES).to(DEVICE)
 
 
 
-optname = sys.argv[1] if len(sys.argv)>=2 else 'sgd'
+optname = 'lars_with_warmup'
 
 log = open(optname+'log.txt','w+')
 
@@ -23,7 +23,6 @@ def training_loop(model, criterion, train_loader, valid_loader, epochs, device, 
     '''
 
     # set objects for storing metrics
-    best_loss = 1e10
     train_losses = []
     valid_losses = []
     train_accuracy = []
@@ -34,7 +33,7 @@ def training_loop(model, criterion, train_loader, valid_loader, epochs, device, 
 
         # training
         if epoch<15:
-            optimizer = LARS(model.parameters(),lr=0.1*epoch/15)
+            optimizer = LARS(model.parameters(),lr=0.1*(epoch+1)/15)
         else:
             optimizer = LARS(model.parameters(),lr=0.1*(0.9)**(epoch-15))
         model, optimizer, train_loss = train(train_loader, model, criterion, optimizer, device)
@@ -59,9 +58,9 @@ def training_loop(model, criterion, train_loader, valid_loader, epochs, device, 
 
     #plot_losses(train_losses, valid_losses)
 
-    return model, optimizer, (train_losses, valid_losses)
+    return model, (train_losses, valid_losses)
 
-model, optimizer, _ = training_loop(model, criterion, train_loader, valid_loader, N_EPOCHS, DEVICE,log)
+model, _ = training_loop(model, criterion, train_loader, valid_loader, N_EPOCHS, DEVICE,log)
 
 with open(optname+'_loss.txt','w+') as myfile:
     json.dump(_,myfile)
