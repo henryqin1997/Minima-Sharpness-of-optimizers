@@ -15,7 +15,7 @@ optname = 'lars_with_warmup'
 
 criterion = nn.CrossEntropyLoss()
 
-def training_loop(model, criterion, train_loader, valid_loader, epochs, device, print_every=1):
+def training_loop_lars(model, criterion, train_loader, valid_loader, epochs, device, print_every=1):
     '''
     Function defining the entire training loop
     '''
@@ -58,7 +58,7 @@ def training_loop(model, criterion, train_loader, valid_loader, epochs, device, 
 
     return model, (train_losses, valid_losses)
 
-model, _ = training_loop(model, criterion, train_loader, valid_loader, N_EPOCHS, DEVICE,log)
+model, _ = training_loop_lars(model, criterion, train_loader, valid_loader, N_EPOCHS, DEVICE,log)
 
 with open(optname+'_loss.txt','w+') as myfile:
     json.dump(_,myfile)
