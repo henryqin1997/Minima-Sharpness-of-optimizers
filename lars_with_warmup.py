@@ -56,7 +56,7 @@ def training_loop_lars(model, criterion, train_loader, valid_loader, epochs, dev
 
     #plot_losses(train_losses, valid_losses)
 
-    return model, (train_losses, valid_losses)
+    return model, [train_losses, valid_losses,train_accuracy,valid_accuracy]
 
 model, _ = training_loop_lars(model, criterion, train_loader, valid_loader, N_EPOCHS, DEVICE,log)
 
