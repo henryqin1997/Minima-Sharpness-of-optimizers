@@ -49,7 +49,7 @@ def training_loop(model, criterion, train_loader, valid_loader, epochs, device, 
             valid_acc = get_accuracy(model, valid_loader, device=device)
             train_accuracy.append(train_acc)
             valid_accuracy.append(valid_acc)
-            log.write(f'{datetime.now().time().replace(microsecond=0)} --- '
+            log.write(
                   f'Epoch: {epoch}\t'
                   f'Train loss: {train_loss:.4f}\t'
                   f'Valid loss: {valid_loss:.4f}\t'
