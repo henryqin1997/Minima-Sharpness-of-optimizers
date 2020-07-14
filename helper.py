@@ -146,45 +146,45 @@ def get_accuracy(model, data_loader, device):
     return correct_pred.float() / n
 
 
-def training_loop(model, criterion, optimizer, train_loader, valid_loader, epochs, device, log, print_every=1):
-    '''
-    Function defining the entire training loop
-    '''
-
-    # set objects for storing metrics
-    best_loss = 1e10
-    train_losses = []
-    valid_losses = []
-    train_accuracy = []
-    valid_accuracy = []
-
-    # Train model
-    for epoch in range(0, epochs):
-
-        # training
-        model, optimizer, train_loss = train(train_loader, model, criterion, optimizer, device)
-        train_losses.append(train_loss)
-
-        # validation
-        with torch.no_grad():
-            model, valid_loss = validate(valid_loader, model, criterion, device)
-            valid_losses.append(valid_loss)
-
-        if epoch % print_every == (print_every - 1):
-            train_acc = get_accuracy(model, train_loader, device=device)
-            valid_acc = get_accuracy(model, valid_loader, device=device)
-            train_accuracy.append(train_acc)
-            valid_accuracy.append(valid_acc)
-            log.write(f'{datetime.now().time().replace(microsecond=0)} --- '
-                  f'Epoch: {epoch}\t'
-                  f'Train loss: {train_loss:.4f}\t'
-                  f'Valid loss: {valid_loss:.4f}\t'
-                  f'Train accuracy: {100 * train_acc:.2f}\t'
-                  f'Valid accuracy: {100 * valid_acc:.2f}\n')
-
-    #plot_losses(train_losses, valid_losses)
-
-    return model, optimizer, (train_losses, valid_losses)
+# def training_loop(model, criterion, optimizer, train_loader, valid_loader, epochs, device, log, print_every=1):
+#     '''
+#     Function defining the entire training loop
+#     '''
+#
+#     # set objects for storing metrics
+#     best_loss = 1e10
+#     train_losses = []
+#     valid_losses = []
+#     train_accuracy = []
+#     valid_accuracy = []
+#
+#     # Train model
+#     for epoch in range(0, epochs):
+#
+#         # training
+#         model, optimizer, train_loss = train(train_loader, model, criterion, optimizer, device)
+#         train_losses.append(train_loss)
+#
+#         # validation
+#         with torch.no_grad():
+#             model, valid_loss = validate(valid_loader, model, criterion, device)
+#             valid_losses.append(valid_loss)
+#
+#         if epoch % print_every == (print_every - 1):
+#             train_acc = get_accuracy(model, train_loader, device=device)
+#             valid_acc = get_accuracy(model, valid_loader, device=device)
+#             train_accuracy.append(train_acc)
+#             valid_accuracy.append(valid_acc)
+#             log.write(f'{datetime.now().time().replace(microsecond=0)} --- '
+#                   f'Epoch: {epoch}\t'
+#                   f'Train loss: {train_loss:.4f}\t'
+#                   f'Valid loss: {valid_loss:.4f}\t'
+#                   f'Train accuracy: {100 * train_acc:.2f}\t'
+#                   f'Valid accuracy: {100 * valid_acc:.2f}\n')
+#
+#     #plot_losses(train_losses, valid_losses)
+#
+#     return model, optimizer, (train_losses, valid_losses)
 
 
 def plot_losses(train_losses, valid_losses):
