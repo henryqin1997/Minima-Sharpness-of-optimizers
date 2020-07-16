@@ -11,7 +11,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.utils.tensorboard import SummaryWriter
+# from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import LambdaLR
 from torchvision import datasets, transforms, models
 import torch.utils.data.distributed
@@ -20,6 +20,7 @@ from torchsummary import summary
 import cifar_resnet as resnet
 import horovod.torch as hvd
 from tqdm import tqdm
+import json
 from utils import *
 
 import kfac
@@ -93,8 +94,6 @@ parser.add_argument('--seed', type=int, default=42, metavar='S',
 parser.add_argument('--fp16-allreduce', action='store_true', default=False,
                     help='use fp16 compression during allreduce')
 
-
-
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 
@@ -114,7 +113,13 @@ args.log_dir = os.path.join(args.log_dir,
                             args.model, args.kfac_update_freq, hvd.size(),
                             datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
 os.makedirs(args.log_dir, exist_ok=True)
-log_writer = SummaryWriter(args.log_dir) if verbose else None
+# log_writer = SummaryWriter(args.log_dir) if verbose else None
+log_writer = open(args.log_dir+'/log.json','w+') if verbose else None
+
+train_loss_list = []
+train_acc_list = []
+valid_loss_list = []
+valid_acc_list = []
 
 # Horovod: limit # of CPU threads to be used per worker.
 torch.set_num_threads(4)
@@ -286,8 +291,10 @@ def train(epoch):
             kfac_param_scheduler.step(epoch)
 
     if log_writer:
-        log_writer.add_scalar('train/loss', train_loss.avg, epoch)
-        log_writer.add_scalar('train/accuracy', train_accuracy.avg, epoch)
+        # log_writer.add_scalar('train/loss', train_loss.avg, epoch)
+        # log_writer.add_scalar('train/accuracy', train_accuracy.avg, epoch)
+        train_loss_list.append(train_loss.avg.item())
+        train_acc_list.append(train_accuracy.avg.item())
 
 def test(epoch):
     model.eval()
@@ -313,8 +320,10 @@ def test(epoch):
                             refresh=False)
 
     if log_writer:
-        log_writer.add_scalar('test/loss', test_loss.avg, epoch)
-        log_writer.add_scalar('test/accuracy', test_accuracy.avg, epoch)
+        # log_writer.add_scalar('test/loss', test_loss.avg, epoch)
+        # log_writer.add_scalar('test/accuracy', test_accuracy.avg, epoch)
+        valid_loss_list.append(test_loss.avg.item())
+        valid_acc_list.append(test_accuracy.avg.item())
 
 
 start = time.time()
@@ -322,6 +331,8 @@ start = time.time()
 for epoch in range(args.epochs):
     train(epoch)
     test(epoch)
+
+json.dump(log_writer,[train_loss_list,train_acc_list,valid_loss_list,valid_acc_list])
 
 if verbose:
     print("\nTraining time:", str(datetime.timedelta(seconds=time.time() - start)))
