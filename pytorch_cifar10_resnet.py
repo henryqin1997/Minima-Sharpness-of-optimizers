@@ -30,6 +30,8 @@ STEP_FIRST = LooseVersion(torch.__version__) < LooseVersion('1.1.0')
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Example')
 parser.add_argument('--model', type=str, default='resnet32',
                     help='ResNet model to use [20, 32, 56]')
+parser.add_argument('--optimizer',type=str,default='sgd',
+                    help='different optimizers')
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
                     help='input batch size for training (default: 128)')
 parser.add_argument('--test-batch-size', type=int, default=128, metavar='N',
@@ -90,6 +92,8 @@ parser.add_argument('--seed', type=int, default=42, metavar='S',
                     help='random seed (default: 42)')
 parser.add_argument('--fp16-allreduce', action='store_true', default=False,
                     help='use fp16 compression during allreduce')
+
+
 
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -168,8 +172,35 @@ criterion = nn.CrossEntropyLoss()
 args.base_lr = args.base_lr * hvd.size()
 use_kfac = True if args.kfac_update_freq > 0 else False
 
-optimizer = optim.SGD(model.parameters(), lr=args.base_lr, momentum=args.momentum,
+if args.optimizer.lower()=='sgd':
+    optimizer = optim.SGD(model.parameters(), lr=args.base_lr, momentum=args.momentum,
                       weight_decay=args.weight_decay)
+elif args.optimizer.lower()=='adam':
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.base_lr, momentum=args.momentum,
+                      weight_decay=args.weight_decay)
+elif args.optimizer.lower() == 'rmsprop':
+    optimizer = optim.RMSprop(model.parameters(),lr=args.base_lr, momentum=args.momentum,
+                      weight_decay=args.weight_decay)
+elif args.optimizer.lower() == 'adagrad':
+    optimizer = optim.Adagrad(model.parameters(), lr=args.base_lr, momentum=args.momentum,
+                      weight_decay=args.weight_decay)
+elif args.optimizer.lower() == 'radam':
+    from radam import RAdam
+    optimizer = RAdam(model.parameters(),lr=args.base_lr,weight_decay=args.weight_decay)
+elif args.optimizer.lower() == 'lars':#no tensorboardX
+    from lars import LARS
+    optimizer = LARS(model.parameters(), lr=args.base_lr, momentum=args.momentum,
+                      weight_decay=args.weight_decay)
+elif args.optimizer.lower() == 'lamb':
+    from lamb import Lamb
+    optimizer  = Lamb(model.parameters(),lr=args.base_lr,weight_decay=args.weight_decay)
+elif args.optimizer.lower() == 'novograd':
+    from novograd import NovoGrad
+    optimizer = NovoGrad(model.parameters(), lr=args.base_lr,weight_decay=args.weight_decay)
+    lr_schedular = optim.lr_scheduler.CosineAnnealingLR(optimizer, 3 * len(train_loader), 1e-4)
+else:
+    optimizer = optim.SGD(model.parameters(), lr=args.base_lr, momentum=args.momentum,
+                          weight_decay=args.weight_decay)
 
 if use_kfac:
     preconditioner = kfac.KFAC(model, lr=args.base_lr, factor_decay=args.stat_decay, 
@@ -197,8 +228,10 @@ optimizer = hvd.DistributedOptimizer(optimizer,
 hvd.broadcast_optimizer_state(optimizer, root_rank=0)
 hvd.broadcast_parameters(model.state_dict(), root_rank=0)
 
-lrs = create_lr_schedule(hvd.size(), args.warmup_epochs, args.lr_decay)
-lr_scheduler = [LambdaLR(optimizer, lrs)]
+if not args.optimizer.lower() == 'novograd':
+    lrs = create_lr_schedule(hvd.size(), args.warmup_epochs, args.lr_decay)
+    lr_scheduler = [LambdaLR(optimizer, lrs)]
+
 if use_kfac:
     lr_scheduler.append(LambdaLR(preconditioner, lrs))
 
