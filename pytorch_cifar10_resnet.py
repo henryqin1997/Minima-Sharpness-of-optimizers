@@ -161,6 +161,8 @@ elif args.model.lower() == "resnet56":
     model = resnet.resnet56()
 elif args.model.lower() == "resnet110":
     model = resnet.resnet110()
+else:
+    model = resnet.resnet56()
 
 if args.cuda:
     model.cuda()
@@ -176,7 +178,7 @@ if args.optimizer.lower()=='sgd':
     optimizer = optim.SGD(model.parameters(), lr=args.base_lr, momentum=args.momentum,
                       weight_decay=args.weight_decay)
 elif args.optimizer.lower()=='adam':
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.base_lr, momentum=args.momentum,
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.base_lr,
                       weight_decay=args.weight_decay)
 elif args.optimizer.lower() == 'rmsprop':
     optimizer = optim.RMSprop(model.parameters(),lr=args.base_lr, momentum=args.momentum,
