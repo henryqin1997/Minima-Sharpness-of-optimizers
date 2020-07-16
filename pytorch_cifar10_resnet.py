@@ -332,6 +332,8 @@ for epoch in range(args.epochs):
     train(epoch)
     test(epoch)
 
+print(train_loss_list)
+print(type(train_acc_list))
 json.dump(log_writer,[train_loss_list,train_acc_list,valid_loss_list,valid_acc_list])
 
 if verbose:
