@@ -293,8 +293,8 @@ def train(epoch):
     if log_writer:
         # log_writer.add_scalar('train/loss', train_loss.avg, epoch)
         # log_writer.add_scalar('train/accuracy', train_accuracy.avg, epoch)
-        train_loss_list.append(train_loss.avg.item())
-        train_acc_list.append(train_accuracy.avg.item())
+        train_loss_list.append(float(train_loss.avg.item()))
+        train_acc_list.append(float(train_accuracy.avg.item()))
 
 def test(epoch):
     model.eval()
@@ -322,8 +322,8 @@ def test(epoch):
     if log_writer:
         # log_writer.add_scalar('test/loss', test_loss.avg, epoch)
         # log_writer.add_scalar('test/accuracy', test_accuracy.avg, epoch)
-        valid_loss_list.append(test_loss.avg.item())
-        valid_acc_list.append(test_accuracy.avg.item())
+        valid_loss_list.append(float(test_loss.avg.item()))
+        valid_acc_list.append(float(test_accuracy.avg.item()))
 
 
 start = time.time()
