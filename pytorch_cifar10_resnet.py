@@ -334,7 +334,7 @@ for epoch in range(args.epochs):
 
 print(train_loss_list)
 print(type(train_acc_list))
-json.dump(log_writer,[train_loss_list,train_acc_list,valid_loss_list,valid_acc_list])
+json.dump([train_loss_list,train_acc_list,valid_loss_list,valid_acc_list],log_writer)
 
 if verbose:
     print("\nTraining time:", str(datetime.timedelta(seconds=time.time() - start)))
