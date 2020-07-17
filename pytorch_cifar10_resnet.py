@@ -109,8 +109,8 @@ if args.cuda:
 torch.backends.cudnn.benchmark = True
 
 args.log_dir = os.path.join(args.log_dir, 
-                            "cifar10_{}_kfac{}_gpu_{}_{}".format(
-                            args.model, args.kfac_update_freq, hvd.size(),
+                            "cifar10_{}_lr{}_kfac{}_gpu_{}_{}".format(
+                            args.model,args.base_lr, args.kfac_update_freq, hvd.size(),
                             datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
 os.makedirs(args.log_dir, exist_ok=True)
 # log_writer = SummaryWriter(args.log_dir) if verbose else None
@@ -180,6 +180,8 @@ args.base_lr = args.base_lr * hvd.size()
 use_kfac = True if args.kfac_update_freq > 0 else False
 
 if args.optimizer.lower()=='sgd':
+    optimizer = optim.SGD(model.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+if args.optimizer.lower()=='sgdwm':
     optimizer = optim.SGD(model.parameters(), lr=args.base_lr, momentum=args.momentum,
                       weight_decay=args.weight_decay)
 elif args.optimizer.lower()=='adam':
@@ -189,15 +191,13 @@ elif args.optimizer.lower() == 'rmsprop':
     optimizer = optim.RMSprop(model.parameters(),lr=args.base_lr, momentum=args.momentum,
                       weight_decay=args.weight_decay)
 elif args.optimizer.lower() == 'adagrad':
-    optimizer = optim.Adagrad(model.parameters(), lr=args.base_lr, momentum=args.momentum,
-                      weight_decay=args.weight_decay)
+    optimizer = optim.Adagrad(model.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
 elif args.optimizer.lower() == 'radam':
     from radam import RAdam
     optimizer = RAdam(model.parameters(),lr=args.base_lr,weight_decay=args.weight_decay)
 elif args.optimizer.lower() == 'lars':#no tensorboardX
     from lars import LARS
-    optimizer = LARS(model.parameters(), lr=args.base_lr, momentum=args.momentum,
-                      weight_decay=args.weight_decay)
+    optimizer = LARS(model.parameters(), lr=args.base_lr,weight_decay=args.weight_decay)
 elif args.optimizer.lower() == 'lamb':
     from lamb import Lamb
     optimizer  = Lamb(model.parameters(),lr=args.base_lr,weight_decay=args.weight_decay)
