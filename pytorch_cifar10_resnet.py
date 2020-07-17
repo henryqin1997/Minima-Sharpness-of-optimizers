@@ -112,7 +112,7 @@ args.log_dir = os.path.join(args.log_dir,
                             "cifar10_{}_lr{}_{}_kfac{}_gpu_{}_{}".format(
                             args.model,args.base_lr,args.optimizer, args.kfac_update_freq, hvd.size(),
                             datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')))
-os.makedirs(args.log_dir, exist_ok=True)
+# os.makedirs(args.log_dir, exist_ok=True)
 # log_writer = SummaryWriter(args.log_dir) if verbose else None
 log_writer = open(args.log_dir+'_log.json','w+') if verbose else None
 
