@@ -204,7 +204,7 @@ elif args.optimizer.lower() == 'lamb':
 elif args.optimizer.lower() == 'novograd':
     from novograd import NovoGrad
     optimizer = NovoGrad(model.parameters(), lr=args.base_lr,weight_decay=args.weight_decay)
-    lr_schedular = [optim.lr_scheduler.CosineAnnealingLR(optimizer, 3 * len(train_loader), 1e-4)]
+    lr_scheduler = [optim.lr_scheduler.CosineAnnealingLR(optimizer, 3 * len(train_loader), 1e-4)]
 else:
     optimizer = optim.SGD(model.parameters(), lr=args.base_lr, momentum=args.momentum,
                           weight_decay=args.weight_decay)
