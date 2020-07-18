@@ -235,8 +235,8 @@ optimizer = hvd.DistributedOptimizer(optimizer,
 hvd.broadcast_optimizer_state(optimizer, root_rank=0)
 hvd.broadcast_parameters(model.state_dict(), root_rank=0)
 
+lrs = create_lr_schedule(hvd.size(), args.warmup_epochs, args.lr_decay)
 if not args.optimizer.lower() == 'novograd':
-    lrs = create_lr_schedule(hvd.size(), args.warmup_epochs, args.lr_decay)
     lr_scheduler = [LambdaLR(optimizer, lrs)]
 
 if use_kfac:
