@@ -27,27 +27,29 @@ parser.add_argument('--epochs', default=2, type=int,
                     help='number of total epochs to run')
 parser.add_argument('-p','--optimizer',default='sgd',type=str,
                     help='optimizer chozen to train')
+parser.add_argument('--lr',type = float,default=0.01, metavar='LR',
+                    help='base learning rate (default: 0.1)')
 args = parser.parse_args()
 
 
 if args.optimizer.lower()=='adam':
-    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 elif args.optimizer.lower()=='sgd':
-    optimizer = optim.SGD(model.parameters(), lr=0.01)
+    optimizer = optim.SGD(model.parameters(), lr=args.lr)
 elif args.optimizer.lower()=='sgdwm':
-    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
 elif args.optimizer.lower() == 'rmsprop':
-    optimizer = optim.RMSprop(model.parameters(),lr=0.001, momentum=0.9)
+    optimizer = optim.RMSprop(model.parameters(),lr=args.lr, momentum=0.9)
 elif args.optimizer.lower() == 'adagrad':
-    optimizer = optim.Adagrad(model.parameters(), lr=0.01)
+    optimizer = optim.Adagrad(model.parameters(), lr=args.lr)
 elif args.optimizer.lower() == 'radam':
     optimizer = RAdam(model.parameters())
 elif args.optimizer.lower() == 'lars':#no tensorboardX
-    optimizer = LARS(model.parameters(), lr=0.1, momentum=0.9)
+    optimizer = LARS(model.parameters(), lr=args.lr, momentum=0.9)
 elif args.optimizer.lower() == 'lamb':
     optimizer  = Lamb(model.parameters())
 elif args.optimizer.lower() == 'novograd':
-    optimizer = NovoGrad(model.parameters(), lr=0.01, weight_decay=0.001)
+    optimizer = NovoGrad(model.parameters(), lr=args.lr, weight_decay=0.001)
     schedular = optim.lr_scheduler.CosineAnnealingLR(optimizer, 3 * len(train_loader), 1e-4)
 
 
@@ -91,5 +93,5 @@ criterion = nn.CrossEntropyLoss()
 
 model, optimizer, _ = training_loop(model, criterion, optimizer, train_loader, valid_loader, N_EPOCHS, DEVICE,log)
 
-with open(optname+'_loss.txt','w+') as myfile:
+with open('lbloss/'+optname+str(args.lr)+'_loss.txt','w+') as myfile:
     json.dump(_,myfile)
