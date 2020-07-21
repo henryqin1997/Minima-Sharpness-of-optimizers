@@ -4,10 +4,8 @@ from lars import LARS
 from lamb import Lamb
 from radam import RAdam
 from novograd import NovoGrad
-import torch.distributed as dist
+# import torch.distributed as dist
 import argparse
-from apex.parallel import DistributedDataParallel as DDP
-from apex import amp
 import sys
 import json
 
