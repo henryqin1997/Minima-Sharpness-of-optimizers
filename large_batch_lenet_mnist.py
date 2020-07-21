@@ -43,11 +43,11 @@ elif args.optimizer.lower() == 'rmsprop':
 elif args.optimizer.lower() == 'adagrad':
     optimizer = optim.Adagrad(model.parameters(), lr=args.lr)
 elif args.optimizer.lower() == 'radam':
-    optimizer = RAdam(model.parameters())
+    optimizer = RAdam(model.parameters(),lr=args.lr)
 elif args.optimizer.lower() == 'lars':#no tensorboardX
     optimizer = LARS(model.parameters(), lr=args.lr, momentum=0.9)
 elif args.optimizer.lower() == 'lamb':
-    optimizer  = Lamb(model.parameters())
+    optimizer  = Lamb(model.parameters(),lr=args.lr)
 elif args.optimizer.lower() == 'novograd':
     optimizer = NovoGrad(model.parameters(), lr=args.lr, weight_decay=0.001)
     schedular = optim.lr_scheduler.CosineAnnealingLR(optimizer, 3 * len(train_loader), 1e-4)
