@@ -83,7 +83,9 @@ else:
 
 optname = args.optimizer if len(sys.argv)>=2 else 'sgd'
 
-log = open(optname+'log.txt','w+')
+# log = open(optname+'log.txt','w+')
+
+log = None
 
 criterion = nn.CrossEntropyLoss()
 

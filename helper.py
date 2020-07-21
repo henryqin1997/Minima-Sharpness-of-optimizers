@@ -15,7 +15,7 @@ DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 RANDOM_SEED = 42
 LEARNING_RATE = 0.001
 BATCH_SIZE = 32
-N_EPOCHS = 10
+N_EPOCHS = 20
 
 IMG_SIZE = 32
 N_CLASSES = 10
@@ -173,8 +173,8 @@ def training_loop(model, criterion, optimizer, train_loader, valid_loader, epoch
         if epoch % print_every == (print_every - 1):
             train_acc = get_accuracy(model, train_loader, device=device)
             valid_acc = get_accuracy(model, valid_loader, device=device)
-            train_accuracy.append(train_acc)
-            valid_accuracy.append(valid_acc)
+            train_accuracy.append(float(train_acc))
+            valid_accuracy.append(float(valid_acc))
             print(f'{datetime.now().time().replace(microsecond=0)} --- '
                   f'Epoch: {epoch}\t'
                   f'Train loss: {train_loss:.4f}\t'
