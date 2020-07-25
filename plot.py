@@ -75,7 +75,6 @@ dir = 'logs/'
 
 #sb cifar10 resnet56
 for i,name in enumerate(name_list):
-    print(dir+name)
     fn = glob.glob(dir+name)[0]
     file = open(fn,'r')
     train_loss,train_accuracy,valid_loss,valid_accuracy = json.load(file)
