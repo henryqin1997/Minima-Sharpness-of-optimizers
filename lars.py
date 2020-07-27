@@ -17,10 +17,10 @@ class LARS(Optimizer):
         epsilon (float, optional): epsilon to prevent zero division (default: 0)
 
     Example:
-        >>> optimizer = torch.optim.LARS(model.parameters(), lr=0.1, momentum=0.9)
-        >>> optimizer.zero_grad()
-        >>> loss_fn(model(input), target).backward()
-        >>> optimizer.step()
+        # >>> optimizer = torch.optim.LARS(model.parameters(), lr=0.1, momentum=0.9)
+        # >>> optimizer.zero_grad()
+        # >>> loss_fn(model(input), target).backward()
+        # >>> optimizer.step()
     """
 
     def __init__(self, params, lr=required, momentum=0, eta=1e-3, dampening=0,
