@@ -24,7 +24,7 @@ class LARS(Optimizer):
     """
 
     def __init__(self, params, lr=required, momentum=0, eta=1e-3, dampening=0,
-                 weight_decay=0, nesterov=False, epsilon=0):
+                 weight_decay=0, nesterov=False, epsilon=1e-5):
         if lr is not required and lr < 0.0:
             raise ValueError("Invalid learning rate: {}".format(lr))
         if momentum < 0.0:
