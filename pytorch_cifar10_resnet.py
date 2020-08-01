@@ -169,6 +169,8 @@ elif args.model.lower() == "resnet110":
 else:
     model = resnet.resnet56()
 
+model = nn.DataParallel(model)
+
 if args.cuda:
     model.cuda()
 
