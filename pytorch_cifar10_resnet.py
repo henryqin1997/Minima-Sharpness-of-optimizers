@@ -159,6 +159,8 @@ test_sampler = torch.utils.data.distributed.DistributedSampler(
 test_loader = torch.utils.data.DataLoader(test_dataset, 
         batch_size=args.test_batch_size, sampler=test_sampler, **kwargs)
 
+use_kfac = True if args.kfac_update_freq > 0 else False
+
 if args.model.lower() == "resnet20":
     model = resnet.resnet20()
 elif args.model.lower() == "resnet32":
@@ -184,7 +186,6 @@ if verbose:
 
 criterion = nn.CrossEntropyLoss()
 args.base_lr = args.base_lr * hvd.size()
-use_kfac = True if args.kfac_update_freq > 0 else False
 
 if args.optimizer.lower()=='sgd':
     optimizer = optim.SGD(model.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
