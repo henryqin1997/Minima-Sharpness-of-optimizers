@@ -93,7 +93,7 @@ parser.add_argument('--seed', type=int, default=42, metavar='S',
                     help='random seed (default: 42)')
 parser.add_argument('--fp16-allreduce', action='store_true', default=False,
                     help='use fp16 compression during allreduce')
-parser.add_argument('--large-batch',action='store_true',default=False,
+parser.add_argument('--lb',action='store_true',default=False,
                     help='use data parallel if set true')
 
 
@@ -171,7 +171,8 @@ elif args.model.lower() == "resnet110":
     model = resnet.resnet110()
 else:
     model = resnet.resnet56()
-if args.large_batch:
+if args.lb:
+    print('LB data parallel training')
     use_kfac = False
     model = nn.DataParallel(model)
 
