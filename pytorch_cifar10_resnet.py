@@ -93,6 +93,9 @@ parser.add_argument('--seed', type=int, default=42, metavar='S',
                     help='random seed (default: 42)')
 parser.add_argument('--fp16-allreduce', action='store_true', default=False,
                     help='use fp16 compression during allreduce')
+parser.add_argument('--large-batch',action='store_true',default=False,
+                    help='use data parallel if set true')
+
 
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -168,8 +171,9 @@ elif args.model.lower() == "resnet110":
     model = resnet.resnet110()
 else:
     model = resnet.resnet56()
-
-model = nn.DataParallel(model)
+if args.large_batch:
+    use_kfac = False
+    model = nn.DataParallel(model)
 
 if args.cuda:
     model.cuda()
