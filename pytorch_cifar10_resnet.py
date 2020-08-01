@@ -83,7 +83,7 @@ parser.add_argument('--distribute-layer-factors', action='store_true', default=F
                     help='Compute A and G for a single layer on different workers')
 
 # Other Parameters
-parser.add_argument('--log-dir', default='./logs',
+parser.add_argument('--log-dir', default='./cifar_resnet_lbloss',
                     help='TensorBoard log directory')
 parser.add_argument('--dir', type=str, default='/tmp/cifar10', metavar='D',
                     help='directory to download cifar10 dataset to')
