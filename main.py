@@ -89,7 +89,7 @@ if args.resume:
     start_epoch = checkpoint['epoch']
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=args.lr, weight_decay=5e-4)
+optimizer = optim.SGD(net.parameters(), lr=args.lr,momentum=0.9, weight_decay=5e-4)
 lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
 lr_scheduler = LambdaLR(optimizer,lrs)
 
@@ -159,5 +159,5 @@ def test(epoch):
 for epoch in range(350):
     train(epoch)
     test(epoch)
-file = open('warmup_version_log.json','w+')
+file = open('original_log.json','w+')
 json.dump([train_acc,valid_acc],file)
