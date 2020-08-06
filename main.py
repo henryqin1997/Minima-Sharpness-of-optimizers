@@ -90,9 +90,9 @@ if args.resume:
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=args.lr,momentum=0.9, weight_decay=5e-4)
-lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
-lr_scheduler = LambdaLR(optimizer,lrs)
-
+# lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
+# lr_scheduler = LambdaLR(optimizer,lrs)
+lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, args.lr_decay, gamma=0.1, last_epoch=-1, verbose=False)
 train_acc = []
 valid_acc = []
 
