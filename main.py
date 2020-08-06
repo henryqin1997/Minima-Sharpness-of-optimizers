@@ -92,7 +92,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=args.lr,momentum=0.9, weight_decay=5e-4)
 # lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
 # lr_scheduler = LambdaLR(optimizer,lrs)
-lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, args.lr_decay, gamma=0.1, last_epoch=-1, verbose=False)
+lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, args.lr_decay, gamma=0.1)
 train_acc = []
 valid_acc = []
 
@@ -143,7 +143,7 @@ def test(epoch):
     # Save checkpoint.
     acc = 100.*correct/total
     valid_acc.append(correct/total)
-    if acc > best_acc and epoch%50==49:
+    if acc > best_acc:
         print('Saving..')
         state = {
             'net': net.state_dict(),
