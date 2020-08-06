@@ -13,7 +13,7 @@ import argparse
 from models import *
 from utils import progress_bar,create_lr_scheduler
 from torch.optim.lr_scheduler import LambdaLR
-
+import json
 
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
@@ -22,7 +22,7 @@ parser.add_argument('--resume', '-r', action='store_true',
                     help='resume from checkpoint')
 parser.add_argument('--warmup-epochs', type=int, default=5, metavar='WE',
                     help='number of warmup epochs (default: 5)')
-parser.add_argument('--lr-decay', nargs='+', type=int, default=[100, 150],
+parser.add_argument('--lr-decay', nargs='+', type=int, default=[150, 250],
                     help='epoch intervals to decay lr')
 args = parser.parse_args()
 
@@ -89,10 +89,12 @@ if args.resume:
     start_epoch = checkpoint['epoch']
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=args.lr,
-                      momentum=0.9, weight_decay=5e-4)
+optimizer = optim.SGD(net.parameters(), lr=args.lr, weight_decay=5e-4)
 lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
 lr_scheduler = LambdaLR(optimizer,lrs)
+
+train_acc = []
+valid_acc = []
 
 # Training
 def train(epoch):
@@ -116,7 +118,7 @@ def train(epoch):
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
-
+    train_acc.append(correct/total)
 
 def test(epoch):
     global best_acc
@@ -140,7 +142,8 @@ def test(epoch):
 
     # Save checkpoint.
     acc = 100.*correct/total
-    if acc > best_acc:
+    valid_acc.append(correct/total)
+    if acc > best_acc and epoch%50==49:
         print('Saving..')
         state = {
             'net': net.state_dict(),
@@ -153,6 +156,8 @@ def test(epoch):
         best_acc = acc
 
 
-for epoch in range(start_epoch, start_epoch+200):
+for epoch in range(350):
     train(epoch)
     test(epoch)
+file = open('new_test_log.json','w+')
+json.dump([train_acc,valid_acc],file)

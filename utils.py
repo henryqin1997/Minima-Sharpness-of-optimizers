@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-#import horovod.torch as hvd
+import horovod.torch as hvd
 import sys
 import time
 import os
@@ -33,9 +33,9 @@ def accuracy(output, target):
 #         loss = (-weight * log_prob).sum(dim=-1).mean()
 #         return loss
 #
-# def metric_average(val_tensor):
-#     avg_tensor = hvd.allreduce(val_tensor)
-#     return avg_tensor.item()
+def metric_average(val_tensor):
+    avg_tensor = hvd.allreduce(val_tensor)
+    return avg_tensor.item()
 
 # Horovod: average metrics from distributed training.
 # class Metric(object):
@@ -68,13 +68,13 @@ def create_lr_schedule(workers, warmup_epochs, decay_schedule, alpha=0.1):
 def create_lr_scheduler(warmup_epochs, decay_schedule, alpha=0.1):
     def lr_schedule(epoch):
         lr_adj = 1.
-        if epoch < warmup_epochs:
-            lr_adj = 1. * (epoch / warmup_epochs + 1)
-        else:
-            decay_schedule.sort(reverse=True)
-            for e in decay_schedule:
-                if epoch >= e:
-                    lr_adj *= alpha
+        # if epoch < warmup_epochs:
+        #     lr_adj = 1. * (epoch+1)/warmup_epochs
+        # else:
+        decay_schedule.sort(reverse=True)
+        for e in decay_schedule:
+            if epoch >= e:
+                lr_adj *= alpha
         return lr_adj
     return lr_schedule
 
