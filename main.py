@@ -152,13 +152,13 @@ def test(epoch):
         }
         if not os.path.isdir('checkpoint'):
             os.mkdir('checkpoint')
-        torch.save(state, './checkpoint/ckpt.pth')
+        torch.save(state, './checkpoint/ckpt1.pth')
         best_acc = acc
 
 
 for epoch in range(350):
     if epoch==150 or epoch==250:
-        checkpoint = torch.load('./checkpoint/ckpt.pth')
+        checkpoint = torch.load('./checkpoint/ckpt1.pth')
         net.load_state_dict(checkpoint['net'])
         best_acc = checkpoint['acc']
         optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
