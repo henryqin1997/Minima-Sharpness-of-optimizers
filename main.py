@@ -92,7 +92,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=args.lr,momentum=0.9, weight_decay=5e-4)
 # lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
 # lr_scheduler = LambdaLR(optimizer,lrs)
-lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, args.lr_decay, gamma=0.1)
+# lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, args.lr_decay, gamma=0.1)
 train_acc = []
 valid_acc = []
 
@@ -110,7 +110,7 @@ def train(epoch):
         loss = criterion(outputs, targets)
         loss.backward()
         optimizer.step()
-        lr_scheduler.step()
+        # lr_scheduler.step()
         train_loss += loss.item()
         _, predicted = outputs.max(1)
         total += targets.size(0)
@@ -161,6 +161,8 @@ for epoch in range(350):
         checkpoint = torch.load('./checkpoint/ckpt1.pth')
         net.load_state_dict(checkpoint['net'])
         best_acc = checkpoint['acc']
+        if epoch==150: args.lr*=0.1
+        if epoch==250: args.lr*=0.1
         optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
     train(epoch)
     test(epoch)

@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-import horovod.torch as hvd
+# import horovod.torch as hvd
 import sys
 import time
 import os
