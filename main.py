@@ -157,7 +157,12 @@ def test(epoch):
 
 
 for epoch in range(350):
+    if epoch==150 or epoch==250:
+        checkpoint = torch.load('./checkpoint/ckpt.pth')
+        net.load_state_dict(checkpoint['net'])
+        best_acc = checkpoint['acc']
+        optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
     train(epoch)
     test(epoch)
-file = open('original_multistep_log.json','w+')
+file = open('original_loadbest_multistep_log.json','w+')
 json.dump([train_acc,valid_acc],file)

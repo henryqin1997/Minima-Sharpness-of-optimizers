@@ -38,19 +38,19 @@ def metric_average(val_tensor):
     return avg_tensor.item()
 
 # Horovod: average metrics from distributed training.
-# class Metric(object):
-#     def __init__(self, name):
-#         self.name = name
-#         self.sum = torch.tensor(0.)
-#         self.n = torch.tensor(0.)
-#
-#     def update(self, val, n=1):
-#         self.sum += float(hvd.allreduce(val.detach().cpu(), name=self.name))
-#         self.n += n
-#
-#     @property
-#     def avg(self):
-#         return self.sum / self.n
+class Metric(object):
+    def __init__(self, name):
+        self.name = name
+        self.sum = torch.tensor(0.)
+        self.n = torch.tensor(0.)
+
+    def update(self, val, n=1):
+        self.sum += float(hvd.allreduce(val.detach().cpu(), name=self.name))
+        self.n += n
+
+    @property
+    def avg(self):
+        return self.sum / self.n
 
 def create_lr_schedule(workers, warmup_epochs, decay_schedule, alpha=0.1):
     def lr_schedule(epoch):
