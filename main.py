@@ -159,5 +159,5 @@ def test(epoch):
 for epoch in range(350):
     train(epoch)
     test(epoch)
-file = open('original_log.json','w+')
+file = open('original_multistep_log.json','w+')
 json.dump([train_acc,valid_acc],file)
