@@ -207,7 +207,7 @@ for epoch in range(60):
             optimizer = optim.SGD(net.parameters(), lr=args.base_lr, momentum=args.momentum,
                                   weight_decay=args.weight_decay)
         elif args.optimizer.lower() == 'adam':
-            optimizer = torch.optim.Adam(net.parameters(), lr=args.base_lr,
+            optimizer = optim.Adam(net.parameters(), lr=args.base_lr,
                                          weight_decay=args.weight_decay)
         elif args.optimizer.lower() == 'rmsprop':
             optimizer = optim.RMSprop(net.parameters(), lr=args.base_lr, momentum=args.momentum,
@@ -219,17 +219,11 @@ for epoch in range(60):
 
             optimizer = RAdam(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
         elif args.optimizer.lower() == 'lars':  # no tensorboardX
-            from lars import LARS
-
             optimizer = LARS(net.parameters(), lr=args.base_lr, momentum=args.momentum, weight_decay=args.weight_decay,
                              dampening=args.damping)
         elif args.optimizer.lower() == 'lamb':
-            from official_lamb_optimizer import Lamb
-
             optimizer = Lamb(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
         elif args.optimizer.lower() == 'novograd':
-            from novograd import NovoGrad
-
             optimizer = NovoGrad(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
         else:
             optimizer = optim.SGD(net.parameters(), lr=args.base_lr, momentum=args.momentum,
