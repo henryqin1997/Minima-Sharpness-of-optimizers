@@ -24,11 +24,16 @@ parser.add_argument('--warmup-epochs', type=int, default=5, metavar='WE',
                     help='number of warmup epochs (default: 5)')
 parser.add_argument('--lr-decay', nargs='+', type=int, default=[150, 250],
                     help='epoch intervals to decay lr')
+parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
+                    help='SGD momentum (default: 0.9)')
+parser.add_argument('--weight-decay', type=float, default=5e-4, metavar='W',
+                    help='SGD weight decay (default: 5e-4)')
 args = parser.parse_args()
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
+trap_count=0
 
 # Data
 print('==> Preparing data..')
@@ -79,17 +84,46 @@ if device == 'cuda':
     net = torch.nn.DataParallel(net)
     cudnn.benchmark = True
 
+ckpt = './checkpoint/'+args.optimizer+str(args.lr)+'_ckpt.pth'
+
 if args.resume:
     # Load checkpoint.
     print('==> Resuming from checkpoint..')
     assert os.path.isdir('checkpoint'), 'Error: no checkpoint directory found!'
-    checkpoint = torch.load('./checkpoint/ckpt.pth')
+    checkpoint = torch.load(ckpt)
     net.load_state_dict(checkpoint['net'])
     best_acc = checkpoint['acc']
     start_epoch = checkpoint['epoch']
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=args.lr,momentum=0.9, weight_decay=5e-4)
+if args.optimizer.lower()=='sgd':
+    optimizer = optim.SGD(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+if args.optimizer.lower()=='sgdwm':
+    optimizer = optim.SGD(net.parameters(), lr=args.base_lr, momentum=args.momentum,
+                      weight_decay=args.weight_decay)
+elif args.optimizer.lower()=='adam':
+    optimizer = torch.optim.Adam(net.parameters(), lr=args.base_lr,
+                      weight_decay=args.weight_decay)
+elif args.optimizer.lower() == 'rmsprop':
+    optimizer = optim.RMSprop(net.parameters(),lr=args.base_lr, momentum=args.momentum,
+                      weight_decay=args.weight_decay)
+elif args.optimizer.lower() == 'adagrad':
+    optimizer = optim.Adagrad(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+elif args.optimizer.lower() == 'radam':
+    from radam import RAdam
+    optimizer = RAdam(net.parameters(),lr=args.base_lr,weight_decay=args.weight_decay)
+elif args.optimizer.lower() == 'lars':#no tensorboardX
+    from lars import LARS
+    optimizer = LARS(net.parameters(), lr=args.base_lr,momentum=args.momentum,weight_decay=args.weight_decay,dampening=args.damping)
+elif args.optimizer.lower() == 'lamb':
+    from official_lamb_optimizer import Lamb
+    optimizer  = Lamb(net.parameters(),lr=args.base_lr,weight_decay=args.weight_decay)
+elif args.optimizer.lower() == 'novograd':
+    from novograd import NovoGrad
+    optimizer = NovoGrad(net.parameters(), lr=args.base_lr,weight_decay=args.weight_decay)
+else:
+    optimizer = optim.SGD(net.parameters(), lr=args.base_lr, momentum=args.momentum,
+                          weight_decay=args.weight_decay)
 # lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
 # lr_scheduler = LambdaLR(optimizer,lrs)
 # lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, args.lr_decay, gamma=0.1)
@@ -122,6 +156,7 @@ def train(epoch):
 
 def test(epoch):
     global best_acc
+    global trap_count
     net.eval()
     test_loss = 0
     correct = 0
@@ -143,7 +178,11 @@ def test(epoch):
     # Save checkpoint.
     acc = 100.*correct/total
     valid_acc.append(correct/total)
-    if acc > best_acc:
+
+    if acc <= best_acc:
+        trap_count += 1
+    else:
+        trap_count=0
         print('Saving..')
         state = {
             'net': net.state_dict(),
@@ -152,19 +191,50 @@ def test(epoch):
         }
         if not os.path.isdir('checkpoint'):
             os.mkdir('checkpoint')
-        torch.save(state, './checkpoint/ckpt1.pth')
+        torch.save(state, ckpt)
         best_acc = acc
 
-
-for epoch in range(350):
-    if epoch==150 or epoch==250:
-        checkpoint = torch.load('./checkpoint/ckpt1.pth')
+for epoch in range(60):
+    if trap_count==5:
+        trap_count=0
+        checkpoint = torch.load(ckpt)
         net.load_state_dict(checkpoint['net'])
         best_acc = checkpoint['acc']
-        if epoch==150: args.lr*=0.1
-        if epoch==250: args.lr*=0.1
-        optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=0.9, weight_decay=5e-4)
+        args.lr*=0.1
+        if args.optimizer.lower() == 'sgd':
+            optimizer = optim.SGD(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+        if args.optimizer.lower() == 'sgdwm':
+            optimizer = optim.SGD(net.parameters(), lr=args.base_lr, momentum=args.momentum,
+                                  weight_decay=args.weight_decay)
+        elif args.optimizer.lower() == 'adam':
+            optimizer = torch.optim.Adam(net.parameters(), lr=args.base_lr,
+                                         weight_decay=args.weight_decay)
+        elif args.optimizer.lower() == 'rmsprop':
+            optimizer = optim.RMSprop(net.parameters(), lr=args.base_lr, momentum=args.momentum,
+                                      weight_decay=args.weight_decay)
+        elif args.optimizer.lower() == 'adagrad':
+            optimizer = optim.Adagrad(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+        elif args.optimizer.lower() == 'radam':
+            from radam import RAdam
+
+            optimizer = RAdam(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+        elif args.optimizer.lower() == 'lars':  # no tensorboardX
+            from lars import LARS
+
+            optimizer = LARS(net.parameters(), lr=args.base_lr, momentum=args.momentum, weight_decay=args.weight_decay,
+                             dampening=args.damping)
+        elif args.optimizer.lower() == 'lamb':
+            from official_lamb_optimizer import Lamb
+
+            optimizer = Lamb(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+        elif args.optimizer.lower() == 'novograd':
+            from novograd import NovoGrad
+
+            optimizer = NovoGrad(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+        else:
+            optimizer = optim.SGD(net.parameters(), lr=args.base_lr, momentum=args.momentum,
+                                  weight_decay=args.weight_decay)
     train(epoch)
     test(epoch)
-file = open('original_loadbest_multistep_log.json','w+')
+file = open(args.optimizer+str(args.lr)+'log.json','w+')
 json.dump([train_acc,valid_acc],file)

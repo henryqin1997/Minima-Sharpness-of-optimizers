@@ -30,7 +30,11 @@ dir = 'logs/'
 # plt.ylabel('loss')
 # plt.legend()
 # plt.show()
-
+from matplotlib import pyplot as plt
+import json
+train_acc,valid_acc = json.load(open('original_loadbest_multistep_log.json','r'))
+plt.plot(valid_acc)
+plt.show()
 
 #sb mnist-lenet
 #
@@ -80,66 +84,66 @@ dir = 'logs/'
 
 
 #sb cifar10 resnet56
-for i,name in enumerate(name_list):
-    fn = glob.glob(dir+name)[0]
-    file = open(fn,'r')
-    train_loss,train_accuracy,valid_loss,valid_accuracy = json.load(file)
-    #plt.plot(train_loss,label = name+'_train',color = color[i],marker = markers[i])
-    #plt.plot(valid_loss,label = name+'_valid',linestyle='dashed',color = color[i],marker = markers[i])
-    plt.plot(valid_accuracy, label=name + '_valid', linestyle='dashed', color=color[i], marker=markers[i])
-
-plt.xlabel('epoch')
-plt.ylabel('validation accuracy')
-plt.legend()
-plt.show()
-
-for i,name in enumerate([name_list[8],name_list[0],name_list[1]]):
-    fn = glob.glob(dir + name)[0]
-    file = open(fn, 'r')
-    train_loss, train_accuracy, valid_loss, valid_accuracy = json.load(file)
-    # plt.plot(train_loss,label = name+'_train',color = color[i],marker = markers[i])
-    # plt.plot(valid_loss,label = name+'_valid',linestyle='dashed',color = color[i],marker = markers[i])
-    plt.plot(valid_accuracy, label=name + '_valid', linestyle='dashed', color=color[i], marker=markers[i])
-
-plt.xlabel('epoch')
-plt.ylabel('validation accuracy')
-plt.legend()
-plt.show()
-
-for i,name in enumerate([name_list[8],name_list[3],name_list[2]]):
-    fn = glob.glob(dir + name)[0]
-    file = open(fn, 'r')
-    train_loss, train_accuracy, valid_loss, valid_accuracy = json.load(file)
-    # plt.plot(train_loss,label = name+'_train',color = color[i],marker = markers[i])
-    # plt.plot(valid_loss,label = name+'_valid',linestyle='dashed',color = color[i],marker = markers[i])
-    plt.plot(valid_accuracy, label=name + '_valid', linestyle='dashed', color=color[i], marker=markers[i])
-plt.xlabel('epoch')
-plt.ylabel('validation accuracy')
-plt.legend()
-plt.show()
-
-for i,name in enumerate([name_list[8],name_list[4],name_list[5]]):
-    fn = glob.glob(dir + name)[0]
-    file = open(fn, 'r')
-    train_loss, train_accuracy, valid_loss, valid_accuracy = json.load(file)
-    # plt.plot(train_loss,label = name+'_train',color = color[i],marker = markers[i])
-    # plt.plot(valid_loss,label = name+'_valid',linestyle='dashed',color = color[i],marker = markers[i])
-    plt.plot(valid_accuracy, label=name + '_valid', linestyle='dashed', color=color[i], marker=markers[i])
-
-plt.xlabel('epoch')
-plt.ylabel('validation accuracy')
-plt.legend()
-plt.show()
-
-for i,name in enumerate([name_list[8],name_list[6],name_list[7]]):
-    fn = glob.glob(dir + name)[0]
-    file = open(fn, 'r')
-    train_loss, train_accuracy, valid_loss, valid_accuracy = json.load(file)
-    # plt.plot(train_loss,label = name+'_train',color = color[i],marker = markers[i])
-    # plt.plot(valid_loss,label = name+'_valid',linestyle='dashed',color = color[i],marker = markers[i])
-    plt.plot(valid_accuracy, label=name + '_valid', linestyle='dashed', color=color[i], marker=markers[i])
-
-plt.xlabel('epoch')
-plt.ylabel('validation accuracy')
-plt.legend()
-plt.show()
+# for i,name in enumerate(name_list):
+#     fn = glob.glob(dir+name)[0]
+#     file = open(fn,'r')
+#     train_loss,train_accuracy,valid_loss,valid_accuracy = json.load(file)
+#     #plt.plot(train_loss,label = name+'_train',color = color[i],marker = markers[i])
+#     #plt.plot(valid_loss,label = name+'_valid',linestyle='dashed',color = color[i],marker = markers[i])
+#     plt.plot(valid_accuracy, label=name + '_valid', linestyle='dashed', color=color[i], marker=markers[i])
+#
+# plt.xlabel('epoch')
+# plt.ylabel('validation accuracy')
+# plt.legend()
+# plt.show()
+#
+# for i,name in enumerate([name_list[8],name_list[0],name_list[1]]):
+#     fn = glob.glob(dir + name)[0]
+#     file = open(fn, 'r')
+#     train_loss, train_accuracy, valid_loss, valid_accuracy = json.load(file)
+#     # plt.plot(train_loss,label = name+'_train',color = color[i],marker = markers[i])
+#     # plt.plot(valid_loss,label = name+'_valid',linestyle='dashed',color = color[i],marker = markers[i])
+#     plt.plot(valid_accuracy, label=name + '_valid', linestyle='dashed', color=color[i], marker=markers[i])
+#
+# plt.xlabel('epoch')
+# plt.ylabel('validation accuracy')
+# plt.legend()
+# plt.show()
+#
+# for i,name in enumerate([name_list[8],name_list[3],name_list[2]]):
+#     fn = glob.glob(dir + name)[0]
+#     file = open(fn, 'r')
+#     train_loss, train_accuracy, valid_loss, valid_accuracy = json.load(file)
+#     # plt.plot(train_loss,label = name+'_train',color = color[i],marker = markers[i])
+#     # plt.plot(valid_loss,label = name+'_valid',linestyle='dashed',color = color[i],marker = markers[i])
+#     plt.plot(valid_accuracy, label=name + '_valid', linestyle='dashed', color=color[i], marker=markers[i])
+# plt.xlabel('epoch')
+# plt.ylabel('validation accuracy')
+# plt.legend()
+# plt.show()
+#
+# for i,name in enumerate([name_list[8],name_list[4],name_list[5]]):
+#     fn = glob.glob(dir + name)[0]
+#     file = open(fn, 'r')
+#     train_loss, train_accuracy, valid_loss, valid_accuracy = json.load(file)
+#     # plt.plot(train_loss,label = name+'_train',color = color[i],marker = markers[i])
+#     # plt.plot(valid_loss,label = name+'_valid',linestyle='dashed',color = color[i],marker = markers[i])
+#     plt.plot(valid_accuracy, label=name + '_valid', linestyle='dashed', color=color[i], marker=markers[i])
+#
+# plt.xlabel('epoch')
+# plt.ylabel('validation accuracy')
+# plt.legend()
+# plt.show()
+#
+# for i,name in enumerate([name_list[8],name_list[6],name_list[7]]):
+#     fn = glob.glob(dir + name)[0]
+#     file = open(fn, 'r')
+#     train_loss, train_accuracy, valid_loss, valid_accuracy = json.load(file)
+#     # plt.plot(train_loss,label = name+'_train',color = color[i],marker = markers[i])
+#     # plt.plot(valid_loss,label = name+'_valid',linestyle='dashed',color = color[i],marker = markers[i])
+#     plt.plot(valid_accuracy, label=name + '_valid', linestyle='dashed', color=color[i], marker=markers[i])
+#
+# plt.xlabel('epoch')
+# plt.ylabel('validation accuracy')
+# plt.legend()
+# plt.show()
