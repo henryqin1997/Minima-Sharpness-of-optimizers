@@ -103,32 +103,32 @@ if args.resume:
 
 criterion = nn.CrossEntropyLoss()
 if args.optimizer.lower()=='sgd':
-    optimizer = optim.SGD(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+    optimizer = optim.SGD(net.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 if args.optimizer.lower()=='sgdwm':
-    optimizer = optim.SGD(net.parameters(), lr=args.base_lr, momentum=args.momentum,
+    optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=args.momentum,
                       weight_decay=args.weight_decay)
 elif args.optimizer.lower()=='adam':
-    optimizer = torch.optim.Adam(net.parameters(), lr=args.base_lr,
+    optimizer = torch.optim.Adam(net.parameters(), lr=args.lr,
                       weight_decay=args.weight_decay)
 elif args.optimizer.lower() == 'rmsprop':
-    optimizer = optim.RMSprop(net.parameters(),lr=args.base_lr, momentum=args.momentum,
+    optimizer = optim.RMSprop(net.parameters(),lr=args.lr, momentum=args.momentum,
                       weight_decay=args.weight_decay)
 elif args.optimizer.lower() == 'adagrad':
-    optimizer = optim.Adagrad(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+    optimizer = optim.Adagrad(net.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 elif args.optimizer.lower() == 'radam':
     from radam import RAdam
-    optimizer = RAdam(net.parameters(),lr=args.base_lr,weight_decay=args.weight_decay)
+    optimizer = RAdam(net.parameters(),lr=args.lr,weight_decay=args.weight_decay)
 elif args.optimizer.lower() == 'lars':#no tensorboardX
     from lars import LARS
-    optimizer = LARS(net.parameters(), lr=args.base_lr,momentum=args.momentum,weight_decay=args.weight_decay,dampening=args.damping)
+    optimizer = LARS(net.parameters(), lr=args.lr,momentum=args.momentum,weight_decay=args.weight_decay,dampening=args.damping)
 elif args.optimizer.lower() == 'lamb':
     from official_lamb_optimizer import Lamb
-    optimizer  = Lamb(net.parameters(),lr=args.base_lr,weight_decay=args.weight_decay)
+    optimizer  = Lamb(net.parameters(),lr=args.lr,weight_decay=args.weight_decay)
 elif args.optimizer.lower() == 'novograd':
     from novograd import NovoGrad
-    optimizer = NovoGrad(net.parameters(), lr=args.base_lr,weight_decay=args.weight_decay)
+    optimizer = NovoGrad(net.parameters(), lr=args.lr,weight_decay=args.weight_decay)
 else:
-    optimizer = optim.SGD(net.parameters(), lr=args.base_lr, momentum=args.momentum,
+    optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=args.momentum,
                           weight_decay=args.weight_decay)
 # lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
 # lr_scheduler = LambdaLR(optimizer,lrs)
@@ -208,31 +208,31 @@ for epoch in range(60):
         best_acc = checkpoint['acc']
         args.lr*=0.1
         if args.optimizer.lower() == 'sgd':
-            optimizer = optim.SGD(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+            optimizer = optim.SGD(net.parameters(), lr=args.lr, weight_decay=args.weight_decay)
         if args.optimizer.lower() == 'sgdwm':
-            optimizer = optim.SGD(net.parameters(), lr=args.base_lr, momentum=args.momentum,
+            optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=args.momentum,
                                   weight_decay=args.weight_decay)
         elif args.optimizer.lower() == 'adam':
-            optimizer = optim.Adam(net.parameters(), lr=args.base_lr,
+            optimizer = optim.Adam(net.parameters(), lr=args.lr,
                                          weight_decay=args.weight_decay)
         elif args.optimizer.lower() == 'rmsprop':
-            optimizer = optim.RMSprop(net.parameters(), lr=args.base_lr, momentum=args.momentum,
+            optimizer = optim.RMSprop(net.parameters(), lr=args.lr, momentum=args.momentum,
                                       weight_decay=args.weight_decay)
         elif args.optimizer.lower() == 'adagrad':
-            optimizer = optim.Adagrad(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+            optimizer = optim.Adagrad(net.parameters(), lr=args.lr, weight_decay=args.weight_decay)
         elif args.optimizer.lower() == 'radam':
             from radam import RAdam
 
-            optimizer = RAdam(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+            optimizer = RAdam(net.parameters(), lr=args.lr, weight_decay=args.weight_decay)
         elif args.optimizer.lower() == 'lars':  # no tensorboardX
-            optimizer = LARS(net.parameters(), lr=args.base_lr, momentum=args.momentum, weight_decay=args.weight_decay,
+            optimizer = LARS(net.parameters(), lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay,
                              dampening=args.damping)
         elif args.optimizer.lower() == 'lamb':
-            optimizer = Lamb(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+            optimizer = Lamb(net.parameters(), lr=args.lr, weight_decay=args.weight_decay)
         elif args.optimizer.lower() == 'novograd':
-            optimizer = NovoGrad(net.parameters(), lr=args.base_lr, weight_decay=args.weight_decay)
+            optimizer = NovoGrad(net.parameters(), lr=args.lr, weight_decay=args.weight_decay)
         else:
-            optimizer = optim.SGD(net.parameters(), lr=args.base_lr, momentum=args.momentum,
+            optimizer = optim.SGD(net.parameters(), lr=args.lr, momentum=args.momentum,
                                   weight_decay=args.weight_decay)
     train(epoch)
     test(epoch)
