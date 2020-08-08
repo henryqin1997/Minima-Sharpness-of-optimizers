@@ -26,7 +26,7 @@ parser.add_argument('--test-batch-size', type=int, default=128, metavar='N',
                     help='input batch size for testing (default: 128)')
 parser.add_argument('--warmup-epochs', type=int, default=5, metavar='WE',
                     help='number of warmup epochs (default: 5)')
-parser.add_argument('--lr-decay', nargs='+', type=int, default=[150, 250],
+parser.add_argument('--lr-decay', nargs='+', type=int, default=[50, 75],
                     help='epoch intervals to decay lr')
 parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
                     help='SGD momentum (default: 0.9)')
@@ -39,7 +39,6 @@ args = parser.parse_args()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
-trap_count=0
 
 # Data
 print('==> Preparing data..')
@@ -162,7 +161,6 @@ def train(epoch):
 
 def test(epoch):
     global best_acc
-    global trap_count
     net.eval()
     test_loss = 0
     correct = 0
@@ -185,10 +183,7 @@ def test(epoch):
     acc = 100.*correct/total
     valid_acc.append(correct/total)
 
-    if acc <= best_acc:
-        trap_count += 1
-    else:
-        trap_count=0
+    if acc > best_acc:
         print('Saving..')
         state = {
             'net': net.state_dict(),
@@ -200,9 +195,8 @@ def test(epoch):
         torch.save(state, ckpt)
         best_acc = acc
 
-for epoch in range(60):
-    if trap_count==5:
-        trap_count=0
+for epoch in range(100):
+    if epoch in args.lr_decay:
         checkpoint = torch.load(ckpt)
         net.load_state_dict(checkpoint['net'])
         best_acc = checkpoint['acc']
