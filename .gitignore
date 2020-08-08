@@ -3,3 +3,4 @@ mnist_data/
 __pycache__/
 images/
 env/
+checkpoint/

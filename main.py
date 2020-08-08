@@ -122,7 +122,7 @@ elif args.optimizer.lower() == 'lars':#no tensorboardX
     from lars import LARS
     optimizer = LARS(net.parameters(), lr=args.lr,momentum=args.momentum,weight_decay=args.weight_decay)
 elif args.optimizer.lower() == 'lamb':
-    from official_lamb_optimizer import Lamb
+    from lamb import Lamb
     optimizer  = Lamb(net.parameters(),lr=args.lr,weight_decay=args.weight_decay)
 elif args.optimizer.lower() == 'novograd':
     from novograd import NovoGrad
