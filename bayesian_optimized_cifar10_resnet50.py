@@ -12,8 +12,7 @@ import os
 import argparse
 
 from models import *
-from utils import progress_bar,create_lr_scheduler
-from torch.optim.lr_scheduler import LambdaLR
+from utils import progress_bar
 import json
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
