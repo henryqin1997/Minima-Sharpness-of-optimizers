@@ -248,3 +248,6 @@ bayes_optimizer = BayesianOptimization(
     verbose=1
 )
 bayes_optimizer.maximize(init_points=1, n_iter=50)
+with open('sgd_bayesian_result.txt') as f:
+    for i, res in enumerate(bayes_optimizer.res):
+        f.write("Iteration {}: \n\t{}\n".format(i, res))
