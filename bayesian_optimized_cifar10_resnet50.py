@@ -37,7 +37,10 @@ parser.add_argument('--optimizer',type=str,default='sgd',
                     help='different optimizers')
 args = parser.parse_args()
 
+best_acc = 0
+
 def main(lr=0.1):
+    global best_acc
     args.lr = lr
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     best_acc = 0  # best test accuracy
@@ -146,6 +149,7 @@ def main(lr=0.1):
         correct = 0
         total = 0
         for batch_idx, (inputs, targets) in enumerate(trainloader):
+            print(batch_idx)
             inputs, targets = inputs.to(device), targets.to(device)
             optimizer.zero_grad()
             outputs = net(inputs)
@@ -157,18 +161,19 @@ def main(lr=0.1):
             _, predicted = outputs.max(1)
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
-
-            progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                         % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
+        print(100.*correct/total)
         train_acc.append(correct/total)
 
     def test(epoch):
+        global best_acc
         net.eval()
         test_loss = 0
         correct = 0
         total = 0
+        print('test')
         with torch.no_grad():
             for batch_idx, (inputs, targets) in enumerate(testloader):
+                print(batch_idx)
                 inputs, targets = inputs.to(device), targets.to(device)
                 outputs = net(inputs)
                 loss = criterion(outputs, targets)
@@ -178,11 +183,9 @@ def main(lr=0.1):
                 total += targets.size(0)
                 correct += predicted.eq(targets).sum().item()
 
-                progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                             % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
-
         # Save checkpoint.
         acc = 100.*correct/total
+        print(acc)
         valid_acc.append(correct/total)
 
         if acc > best_acc:
