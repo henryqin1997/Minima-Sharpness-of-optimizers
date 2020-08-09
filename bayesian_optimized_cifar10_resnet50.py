@@ -163,7 +163,6 @@ def main(lr=0.1):
         train_acc.append(correct/total)
 
     def test(epoch):
-        global best_acc
         net.eval()
         test_loss = 0
         correct = 0
