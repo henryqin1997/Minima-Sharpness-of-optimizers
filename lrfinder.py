@@ -150,7 +150,7 @@ def train(epoch):
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
 
-        trainloss_list.append(train_loss)
+        trainloss_list.append(float(loss.item()))
 
 
 for epoch in range(200):
