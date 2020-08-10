@@ -18,7 +18,7 @@ import json
 
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
-parser.add_argument('--lr', default=0.1, type=float, help='learning rate')
+parser.add_argument('--lr', default=1, type=float, help='learning rate')
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
                     help='input batch size for training (default: 128)')
 parser.add_argument('--test-batch-size', type=int, default=128, metavar='N',
@@ -132,6 +132,7 @@ def train(epoch):
     train_loss = 0
     correct = 0
     total = 0
+    print('lr:'+str(lr_scheduler.get_lr()))
     for batch_idx, (inputs, targets) in enumerate(trainloader):
         inputs, targets = inputs.to(device), targets.to(device)
         optimizer.zero_grad()
@@ -139,7 +140,6 @@ def train(epoch):
         loss = criterion(outputs, targets)
         loss.backward()
         optimizer.step()
-        lr_scheduler.step()
         train_loss += loss.item()
         _, predicted = outputs.max(1)
         total += targets.size(0)
@@ -147,6 +147,8 @@ def train(epoch):
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
+    lr_scheduler.step()
+    print('current lr:'+str(lr_scheduler.get_lr()))
     trainloss_list.append(train_loss)
 
 def test(epoch):
@@ -173,7 +175,7 @@ def test(epoch):
     loss_list.append(test_loss)
 
 
-for epoch in range(1):
+for epoch in range(200):
     train(epoch)
     test(epoch)
 file = open(args.optimizer+'lr_range_find.json','w+')
