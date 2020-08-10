@@ -23,10 +23,6 @@ parser.add_argument('--batch-size', type=int, default=128, metavar='N',
                     help='input batch size for training (default: 128)')
 parser.add_argument('--test-batch-size', type=int, default=128, metavar='N',
                     help='input batch size for testing (default: 128)')
-parser.add_argument('--warmup-epochs', type=int, default=5, metavar='WE',
-                    help='number of warmup epochs (default: 5)')
-parser.add_argument('--lr-decay', nargs='+', type=int, default=[50, 75],
-                    help='epoch intervals to decay lr')
 parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
                     help='SGD momentum (default: 0.9)')
 parser.add_argument('--weight-decay', type=float, default=5e-4, metavar='W',
