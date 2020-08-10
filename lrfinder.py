@@ -118,7 +118,7 @@ else:
 def lrs(epoch):
     low = math.log2(1e-5)
     high = math.log2(10)
-    return 2**(low+(high-low)*epoch/200)
+    return 2**(low+(high-low)*epoch/391)
 
 lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer,lrs)
 
@@ -132,14 +132,16 @@ def train(epoch):
     train_loss = 0
     correct = 0
     total = 0
-    print('lr:'+str(lr_scheduler.get_lr()))
     for batch_idx, (inputs, targets) in enumerate(trainloader):
+        print('lr:' + str(lr_scheduler.get_lr()))
         inputs, targets = inputs.to(device), targets.to(device)
         optimizer.zero_grad()
         outputs = net(inputs)
         loss = criterion(outputs, targets)
         loss.backward()
         optimizer.step()
+        lr_scheduler.step()
+        print('current lr:' + str(lr_scheduler.get_lr()))
         train_loss += loss.item()
         _, predicted = outputs.max(1)
         total += targets.size(0)
@@ -147,36 +149,11 @@ def train(epoch):
 
         progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
-    lr_scheduler.step()
-    print('current lr:'+str(lr_scheduler.get_lr()))
-    trainloss_list.append(train_loss)
 
-def test(epoch):
-    global best_acc
-    net.eval()
-    test_loss = 0
-    correct = 0
-    total = 0
-    with torch.no_grad():
-        for batch_idx, (inputs, targets) in enumerate(testloader):
-            inputs, targets = inputs.to(device), targets.to(device)
-            outputs = net(inputs)
-            loss = criterion(outputs, targets)
-
-            test_loss += loss.item()
-            _, predicted = outputs.max(1)
-            total += targets.size(0)
-            correct += predicted.eq(targets).sum().item()
-
-            progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                         % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
-
-    # Save checkpoint.
-    loss_list.append(test_loss)
+        trainloss_list.append(train_loss)
 
 
 for epoch in range(200):
     train(epoch)
-    test(epoch)
-file = open(args.optimizer+'lr_range_find.json','w+')
-json.dump([trainloss_list,loss_list],file)
+file = open(args.optimizer+'_lr_range_find_minibatch.json','w+')
+json.dump(trainloss_list,file)
