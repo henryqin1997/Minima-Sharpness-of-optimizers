@@ -8,10 +8,12 @@ import math
 low = math.log2(1e-5)
 high = math.log2(10)
 name_list = ['sgd','sgdwm','rmsprop','adagrad','adam','radam','lars','lamb','novograd']
-for opt in name_list[:1]:
-    trainloss,validloss = json.load(open(opt+'lr_range_find.json'))
-    x = [2**(low+(high-low)*i/200) for i in range(200)]
-    plt.plot(x,trainloss[:200])
+for opt in name_list[8:]:
+    trainloss = json.load(open(opt+'_lr_range_find_minibatch.json'))
+    i = trainloss.index(min(trainloss))
+    print(i,2**(low+(high-low)*i/391/5))
+    x = [2**(low+(high-low)*i/391/5) for i in range(int(391*5*(0-low)/(high-low)))]
+    plt.plot(x,trainloss[:int(391*5*(0-low)/(high-low))])
     plt.xscale('log')
     plt.title(opt+'_lr_range_test')
     plt.show()
