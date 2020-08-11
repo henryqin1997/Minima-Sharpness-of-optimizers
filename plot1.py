@@ -7,18 +7,37 @@ import math
 # print((valid_acc.index(max(valid_acc[250:]))))
 low = math.log2(1e-5)
 high = math.log2(10)
+log_neg_one = -3.321928094887362
+log_neg_two = -6.643856189774724
 name_list = ['sgd','sgdwm','rmsprop','adagrad','adam','radam','lars','lamb','novograd']
 
-for opt in name_list[:1]:
-    trainloss = json.load(open('lr_range_test_data/'+opt+'_lr_range_find_minibatch.json'))
-    x = [2**(low+(high-low)*i/391/5) for i in range(int(391*5*(0-low)/(high-low)))]
-    y = trainloss
-    i = y.index(min(y))
-    print(i, 2 ** (low + (high - low) * i / 391 / 5))
-    plt.plot(x,y)
-    plt.xscale('log')
-    plt.title(opt+'_lr_range_test')
-    plt.show()
+
+# original curve
+# for opt in name_list[:1]:
+#     trainloss = json.load(open('lr_range_test_data/'+opt+'_lr_range_find_minibatch.json'))
+#     x = [2**(low+(high-low)*i/391/5) for i in range(int(391*5*(0-low)/(high-low)))]
+#     y = trainloss
+#     i = y.index(min(y))
+#     print(i, 2 ** (low + (high - low) * i / 391 / 5))
+#     plt.plot(x,y)
+#     plt.xscale('log')
+#     plt.title(opt+'_lr_range_test')
+#     plt.show()
+
+#smooth curve
+# for opt in name_list[:1]:
+#     trainloss = json.load(open('lr_range_test_data/'+opt+'_lr_range_find_minibatch.json'))
+#     trainloss = [sum(trainloss[i-20:i])/20 for i in range(20,int(391*5*(0-low)/(high-low)))]
+#     x = [2**(low+(high-low)*i/391/5) for i in range(20,int(391*5*(0-low)/(high-low)))]
+#     y = trainloss
+#     i = y.index(min(y))
+#     print(i, 2 ** (low + (high - low) * i / 391 / 5))
+#     plt.plot(x,y)
+#     plt.xscale('log')
+#     plt.title(opt+'_lr_range_test')
+#     plt.show()
+
+
 #rate
 # for opt in name_list[:1]:
 #     trainloss = json.load(open('lr_range_test_data/'+opt+'_lr_range_find_minibatch.json'))
