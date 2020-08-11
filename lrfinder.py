@@ -153,7 +153,7 @@ def train(epoch):
         trainloss_list.append(float(loss.item()))
 
 
-for epoch in range(200):
+for epoch in range(1):
     train(epoch)
 file = open(args.optimizer+'_lr_range_find_minibatch.json','w+')
 json.dump(trainloss_list,file)
