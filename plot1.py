@@ -8,12 +8,25 @@ import math
 low = math.log2(1e-5)
 high = math.log2(10)
 name_list = ['sgd','sgdwm','rmsprop','adagrad','adam','radam','lars','lamb','novograd']
-for opt in name_list[8:]:
-    trainloss = json.load(open(opt+'_lr_range_find_minibatch.json'))
-    i = trainloss.index(min(trainloss))
-    print(i,2**(low+(high-low)*i/391/5))
+
+for opt in name_list[:1]:
+    trainloss = json.load(open('lr_range_test_data/'+opt+'_lr_range_find_minibatch.json'))
     x = [2**(low+(high-low)*i/391/5) for i in range(int(391*5*(0-low)/(high-low)))]
-    plt.plot(x,trainloss[:int(391*5*(0-low)/(high-low))])
+    y = trainloss
+    i = y.index(min(y))
+    print(i, 2 ** (low + (high - low) * i / 391 / 5))
+    plt.plot(x,y)
     plt.xscale('log')
     plt.title(opt+'_lr_range_test')
     plt.show()
+#rate
+# for opt in name_list[:1]:
+#     trainloss = json.load(open('lr_range_test_data/'+opt+'_lr_range_find_minibatch.json'))
+#     x = [2**(low+(high-low)*i/391/5) for i in range(1,int(391*5*(0-low)/(high-low)))]
+#     y = [trainloss[i]-trainloss[i-1] for i in range(1,int(391*5*(0-low)/(high-low)))]
+#     i = y.index(min(y))
+#     print(i, 2 ** (low + (high - low) * i / 391 / 5))
+#     plt.plot(x,y)
+#     plt.xscale('log')
+#     plt.title(opt+'_lr_range_test')
+#     plt.show()
