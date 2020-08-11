@@ -115,10 +115,10 @@ else:
                           weight_decay=args.weight_decay)
 # lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
 # lr_scheduler = LambdaLR(optimizer,lrs)
-def lrs(epoch):
+def lrs(batch):
     low = math.log2(1e-5)
     high = math.log2(10)
-    return 2**(low+(high-low)*epoch/391)
+    return 2**(low+(high-low)*batch/391/5)
 
 lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer,lrs)
 
@@ -133,7 +133,6 @@ def train(epoch):
     correct = 0
     total = 0
     for batch_idx, (inputs, targets) in enumerate(trainloader):
-        print('lr:' + str(lr_scheduler.get_lr()))
         inputs, targets = inputs.to(device), targets.to(device)
         optimizer.zero_grad()
         outputs = net(inputs)
@@ -153,7 +152,7 @@ def train(epoch):
         trainloss_list.append(float(loss.item()))
 
 
-for epoch in range(1):
+for epoch in range(5):
     train(epoch)
 file = open(args.optimizer+'_lr_range_find_minibatch.json','w+')
 json.dump(trainloss_list,file)

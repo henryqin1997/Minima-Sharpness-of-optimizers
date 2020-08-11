@@ -8,10 +8,10 @@ import math
 low = math.log2(1e-5)
 high = math.log2(10)
 name_list = ['sgd','sgdwm','rmsprop','adagrad','adam','radam','lars','lamb','novograd']
-for opt in name_list:
+for opt in name_list[:1]:
     trainloss,validloss = json.load(open(opt+'lr_range_find.json'))
-    x = [2**(low+(high-low)*i/200) for i in range(100)]
-    plt.plot(x,trainloss[:100])
+    x = [2**(low+(high-low)*i/200) for i in range(200)]
+    plt.plot(x,trainloss[:200])
     plt.xscale('log')
     plt.title(opt+'_lr_range_test')
     plt.show()
