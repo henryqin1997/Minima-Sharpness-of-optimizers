@@ -34,9 +34,7 @@ parser.add_argument('--weight-decay', type=float, default=5e-4, metavar='W',
 parser.add_argument('--optimizer',type=str,default='sgd',
                     help='different optimizers')
 parser.add_argument('--max-lr',default=0.1,type=float)
-parser.add_argument('--div-factor',default=25,type=float)
-parser.add_argument('--final-div',default=10000,type=float)
-parser.add_argument('')
+
 args = parser.parse_args()
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -124,8 +122,7 @@ else:
 # lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
 # lr_scheduler = LambdaLR(optimizer,lrs)
 # lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, args.lr_decay, gamma=0.1)
-lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.max_lr,steps_per_epoch=len(trainloader), epochs=150,
-                        div_factor = args.div_factor,final_div_factor = args.final_div)
+lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.max_lr,steps_per_epoch=len(trainloader), epochs=150)
 train_acc = []
 valid_acc = []
 
@@ -174,7 +171,6 @@ def test(epoch):
                          % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
 
     # Save checkpoint.
-    acc = 100.*correct/total
     valid_acc.append(correct/total)
 
 for epoch in range(100):
