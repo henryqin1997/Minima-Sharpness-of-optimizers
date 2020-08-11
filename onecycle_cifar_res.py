@@ -179,5 +179,5 @@ def test(epoch):
 for epoch in range(100):
     train(epoch)
     test(epoch)
-file = open(args.optimizer+'_onecycle_log.json','w+')
+file = open(args.optimizer+str(args.max_lr)+'_onecycle_log.json','w+')
 json.dump([train_acc,valid_acc],file)
