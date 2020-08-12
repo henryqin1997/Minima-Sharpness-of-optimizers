@@ -11,9 +11,8 @@ import os
 import argparse
 
 from models import *
-from utils import progress_bar
 import json
-
+from matplotlib import pyplot as plt
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=1, type=float, help='learning rate')
@@ -129,55 +128,16 @@ lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.max_lr,steps_p
 train_acc = []
 valid_acc = []
 
+lr_list=[]
+
 # Training
 def train(epoch):
-    print('\nEpoch: %d' % epoch)
-    net.train()
-    train_loss = 0
-    correct = 0
-    total = 0
-    for batch_idx, (inputs, targets) in enumerate(trainloader):
-        inputs, targets = inputs.to(device), targets.to(device)
-        optimizer.zero_grad()
-        outputs = net(inputs)
-        loss = criterion(outputs, targets)
-        loss.backward()
-        optimizer.step()
+    for batch_idx in range(len(trainloader)):
         lr_scheduler.step()
-        train_loss += loss.item()
-        _, predicted = outputs.max(1)
-        total += targets.size(0)
-        correct += predicted.eq(targets).sum().item()
-
-        progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                     % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
-    train_acc.append(correct/total)
-
-def test(epoch):
-    global best_acc
-    net.eval()
-    test_loss = 0
-    correct = 0
-    total = 0
-    with torch.no_grad():
-        for batch_idx, (inputs, targets) in enumerate(testloader):
-            inputs, targets = inputs.to(device), targets.to(device)
-            outputs = net(inputs)
-            loss = criterion(outputs, targets)
-
-            test_loss += loss.item()
-            _, predicted = outputs.max(1)
-            total += targets.size(0)
-            correct += predicted.eq(targets).sum().item()
-
-            progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                         % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
-
-    # Save checkpoint.
-    valid_acc.append(correct/total)
+        lr_list.append(lr_scheduler.get_last_lr())
 
 for epoch in range(150):
     train(epoch)
-    test(epoch)
-file = open(args.optimizer+str(args.max_lr)+'_onecycle_log.json','w+')
-json.dump([train_acc,valid_acc],file)
+
+plt.plot(lr_list)
+plt.show()
