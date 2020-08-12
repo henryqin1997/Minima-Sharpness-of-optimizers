@@ -11,10 +11,10 @@ log_neg_one = -3.321928094887362
 log_neg_two = -6.643856189774724
 name_list = ['sgd','sgdwm','rmsprop','adagrad','adam','radam','lars','lamb','novograd']
 
-# trainacc,validacc = json.load(open('onecyclelog/radam_onecycle_log.json'))
-# plt.plot(validacc)
-# plt.title('radam onecycle valid acc, max lr 0.015')
-# plt.show()
+trainacc,validacc = json.load(open('onecyclelog/adam0.001_onecycle_log.json'))
+plt.plot(validacc)
+plt.title('onecycle valid acc, max lr 2.3')
+plt.show()
 
 # original curve
 # for opt in name_list[:1]:
@@ -29,17 +29,17 @@ name_list = ['sgd','sgdwm','rmsprop','adagrad','adam','radam','lars','lamb','nov
 #     plt.show()
 
 #smooth curve
-for opt in name_list[5:6]:
-    trainloss = json.load(open('lr_range_test_data/'+opt+'_lr_range_find_minibatch.json'))
-    trainloss = [sum(trainloss[i-20:i])/20 for i in range(20,int(391*5*(log_neg_one-low)/(high-low)))]
-    x = [2**(low+(high-low)*i/391/5) for i in range(20,int(391*5*(log_neg_one-low)/(high-low)))]
-    y = trainloss
-    i = y.index(min(y))
-    print(i, 2 ** (low + (high - low) * i / 391 / 5))
-    plt.plot(x,y)
-    plt.xscale('log')
-    plt.title(opt+'_lr_range_test')
-    plt.show()
+# for opt in name_list[5:6]:
+#     trainloss = json.load(open('lr_range_test_data/'+opt+'_lr_range_find_minibatch.json'))
+#     trainloss = [sum(trainloss[i-20:i])/20 for i in range(20,int(391*5*(log_neg_one-low)/(high-low)))]
+#     x = [2**(low+(high-low)*i/391/5) for i in range(20,int(391*5*(log_neg_one-low)/(high-low)))]
+#     y = trainloss
+#     i = y.index(min(y))
+#     print(i, 2 ** (low + (high - low) * i / 391 / 5))
+#     plt.plot(x,y)
+#     plt.xscale('log')
+#     plt.title(opt+'_lr_range_test')
+#     plt.show()
 
 
 #rate

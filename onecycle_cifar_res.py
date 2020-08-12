@@ -9,6 +9,7 @@ import torchvision.transforms as transforms
 
 import os
 import argparse
+import datetime
 
 from models import *
 from utils import progress_bar
@@ -179,5 +180,5 @@ def test(epoch):
 for epoch in range(150):
     train(epoch)
     test(epoch)
-file = open(args.optimizer+str(args.max_lr)+'_onecycle_log.json','w+')
+file = open(args.optimizer+str(args.max_lr/args.div_factor)+'-'+str(args.max_lr)+'-'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')+'_onecycle_log.json','w+')
 json.dump([train_acc,valid_acc],file)
