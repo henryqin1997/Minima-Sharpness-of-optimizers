@@ -154,5 +154,5 @@ def train(epoch):
 
 for epoch in range(5):
     train(epoch)
-file = open(args.optimizer+'_lr_range_find_minibatch.json','w+')
+file = open(args.optimizer+'_batchsize_'+str(args.batch_size)+'_lr_range_find_minibatch.json','w+')
 json.dump(trainloss_list,file)
