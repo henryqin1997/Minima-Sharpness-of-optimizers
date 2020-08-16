@@ -118,7 +118,7 @@ else:
 def lrs(batch):
     low = math.log2(1e-5)
     high = math.log2(10)
-    return 2**(low+(high-low)*batch/391/5)
+    return 2**(low+(high-low)*batch/(len(trainloader))/5)
 
 lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer,lrs)
 
@@ -152,7 +152,7 @@ def train(epoch):
         trainloss_list.append(float(loss.item()))
 
 
-for epoch in range(5):
+for epoch in range(20):
     train(epoch)
 file = open(args.optimizer+'_batchsize_'+str(args.batch_size)+'_lr_range_find_minibatch.json','w+')
 json.dump(trainloss_list,file)
