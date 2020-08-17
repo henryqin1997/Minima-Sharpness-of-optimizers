@@ -43,8 +43,8 @@ args = parser.parse_args()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
-ckptbest = './checkpoint/'+args.optimizer+str(args.lr)+'_ckptbest.pth'
-ckptworst = './checkpoint/'+args.optimizer+str(args.lr)+'_ckptworst.pth'
+ckptbest = './checkpoint/'+args.optimizer+str(args.max_lr)+'_ckptbest.pth'
+ckptworst = './checkpoint/'+args.optimizer+str(args.max_lr)+'_ckptworst.pth'
 # Data
 print('==> Preparing data..')
 transform_train = transforms.Compose([
