@@ -76,6 +76,8 @@ testloader = torch.utils.data.DataLoader(
     testset, batch_size=100, shuffle=False, num_workers=2)
 
 net = ResNet50()
+net.to(device)
+
 if args.resume_best:
     checkpoint = torch.load(ckptbest)
     net.load_state_dict(checkpoint['net'])
