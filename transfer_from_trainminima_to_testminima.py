@@ -18,9 +18,11 @@ import json
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 train on test')
 parser.add_argument('--lr', default=1, type=float, help='learning rate')
-parser.add_argument('--resume-best', '-r', action='store_true',
+parser.add_argument('--resume-best', '-rb', action='store_true',
                     help='resume from checkpoint')
-parser.add_argument('--resume-worst', '-r', action='store_true',
+parser.add_argument('--resume-worst', '-rw', action='store_true',
+                    help='resume from checkpoint')
+parser.add_argument('--resume-init', '-ri', action='store_true',
                     help='resume from checkpoint')
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
                     help='input batch size for training (default: 128)')
@@ -46,6 +48,7 @@ args = parser.parse_args()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
+ckptinit = './checkpoint/'+args.optimizer+str(args.max_lr)+'_ckptinit.pth'
 ckptbest = './checkpoint/'+args.optimizer+str(args.max_lr)+'_ckptbest.pth'
 ckptworst = './checkpoint/'+args.optimizer+str(args.max_lr)+'_ckptworst.pth'
 # Data
