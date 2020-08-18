@@ -3,7 +3,7 @@ import reverse_sgd
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 def sharpness(model,data_loader,criterion,epsilon_list=[1e-5]):
-    res = []
+    res,res_eps,res_original = [],[],[]
     params = model.state_dict()
     currentloss = 0
     for batch_idx, (inputs, targets) in enumerate(data_loader):
@@ -28,5 +28,8 @@ def sharpness(model,data_loader,criterion,epsilon_list=[1e-5]):
             sharploss += loss.item()
         sharploss/=len(data_loader)
         res.append((sharploss-currentloss)/(1+currentloss))
+        res_eps.append((sharploss-currentloss)/(1+currentloss)/eps)
+        res_original.append(sharploss)
         model.load_state_dict(params)
-    return res
+    return res,res_eps,res_original
+
