@@ -16,7 +16,7 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     install_requires=[
-        "torch >= 1.0",
+        "torch >= 1.3",
         "horovod",
         "torchvision",
         "pillow<7"
