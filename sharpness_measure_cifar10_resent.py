@@ -1,6 +1,6 @@
 import torch
 
-ckpt = './checkpoint/novograd0.05_ckptworst.pth'
+ckpt = './checkpoint/novograd0.05_ckptbest.pth'
 
 print(torch.__version__)
 
