@@ -1,7 +1,7 @@
 import torch
 
-ckpt = './checkpoint/novograd0.05_ckptworst.pt'
+ckpt = './checkpoint/novograd0.05_ckptworst.pth'
 
-checkpoint = torch.jit.load(ckpt)
+checkpoint = torch.load(ckpt)
 
 print(checkpoint)
