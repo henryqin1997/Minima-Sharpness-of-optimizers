@@ -48,7 +48,7 @@ args = parser.parse_args()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 best_acc = 0  # best test accuracy
 start_epoch = 0  # start from epoch 0 or last checkpoint epoch
-ckptinit = './checkpoint/'+args.optimizer+str(args.max_lr)+'_ckptinit.pth'
+ckptinit = './checkpoint/novograd0.05_ckptinit.pth'
 ckptbest = './checkpoint/'+args.optimizer+str(args.max_lr)+'_ckptbest.pth'
 ckptworst = './checkpoint/'+args.optimizer+str(args.max_lr)+'_ckptworst.pth'
 # Data
@@ -80,11 +80,18 @@ net.to(device)
 
 if args.resume_best:
     checkpoint = torch.load(ckptbest, map_location=lambda storage, loc: storage)
+    checkpoint['net'] = {k[7:]: checkpoint['net'][k] for k in checkpoint['net']}
     net.load_state_dict(checkpoint['net'])
 
 elif args.resume_worst:
     checkpoint = torch.load(ckptworst, map_location=lambda storage, loc: storage)
+    checkpoint['net'] = {k[7:]: checkpoint['net'][k] for k in checkpoint['net']}
     net.load_state_dict(checkpoint['net'])
+elif args.resume_init:
+    checkpoint = torch.load(ckptinit, map_location=lambda storage, loc: storage)
+    checkpoint['net'] = {k[7:]: checkpoint['net'][k] for k in checkpoint['net']}
+    net.load_state_dict(checkpoint['net'])
+
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=args.max_lr/args.final_div)
