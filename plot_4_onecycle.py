@@ -5,9 +5,9 @@ import numpy as np
 names = ['lamb0.0008-0.02*','lars0.092-2.3*','novograd0.002-0.05*','radam0.0006-0.015*']
 
 for name in names[2:3]:
-    fn = glob.glob(name)
+    fn = glob.glob('./onecyclelog/'+name)
     valid_list = []
-    for f in fn[3:4]:
+    for f in fn:
         train_acc,valid_acc = json.load(open(f,'r'))
         # valid_list.append(valid_acc)
         plt.plot(train_acc)

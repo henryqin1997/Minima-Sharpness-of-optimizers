@@ -80,9 +80,8 @@ print('==> Building model..')
 # net = RegNetX_200MF()
 net = ResNet50()
 net = net.to(device)
-if device == 'cuda':
-    net = torch.nn.DataParallel(net)
-    cudnn.benchmark = True
+net = torch.nn.DataParallel(net)
+
 
 criterion = nn.CrossEntropyLoss()
 if args.optimizer.lower()=='sgd':

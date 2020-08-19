@@ -41,7 +41,7 @@ class REV_SGD(Optimizer):
         The Nesterov version is analogously modified.
     """
 
-    def __init__(self, params, lr=required, momentum=0, dampening=0,
+    def __init__(self, params, lr=1.0, momentum=0, dampening=0,
                  weight_decay=0, nesterov=False,epsilon=1e-5):
         if lr is not required and lr < 0.0:
             raise ValueError("Invalid learning rate: {}".format(lr))

@@ -79,18 +79,20 @@ net = ResNet50()
 net.to(device)
 
 if args.resume_best:
-    checkpoint = torch.load(ckptbest)
+    checkpoint = torch.load(ckptbest, map_location=lambda storage, loc: storage)
     net.load_state_dict(checkpoint['net'])
 
 elif args.resume_worst:
-    checkpoint = torch.load(ckptworst)
+    checkpoint = torch.load(ckptworst, map_location=lambda storage, loc: storage)
     net.load_state_dict(checkpoint['net'])
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=args.max_lr/args.final_div)
 
-train_on_tset_acc = []
+train_on_test_acc = []
 valid_on_train_acc = []
+train_on_test_loss = []
+test_on_train_loss = []
 
 def train_on_test(epoch):
     print('\nTraining on test, Epoch: %d' % epoch)
@@ -112,7 +114,8 @@ def train_on_test(epoch):
 
         progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
-    train_on_tset_acc.append(correct / total)
+    train_on_test_acc.append(correct / total)
+    train_on_test_loss.append(float(train_loss/len(testloader)))
 
 def test_on_train(epoch):
     net.eval()
@@ -134,11 +137,12 @@ def test_on_train(epoch):
                          % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
 
     valid_on_train_acc.append(correct / total)
+    test_on_train_loss.append(test_loss/len(trainloader))
 
 for epoch in range(args.epoch):
     train_on_test(epoch)
     test_on_train(epoch)
 
 file = open(args.optimizer+str(args.max_lr)+'-'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')+'_onecycle_transfer_train_to test_log.json','w+')
-json.dump([train_on_tset_acc,valid_on_train_acc],file)
+json.dump([train_on_test_acc,valid_on_train_acc,train_on_test_loss,test_on_train_loss],file)
 
