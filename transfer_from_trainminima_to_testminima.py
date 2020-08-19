@@ -94,7 +94,7 @@ elif args.resume_init:
 
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=args.max_lr/args.final_div)
+optimizer = optim.SGD(net.parameters(), lr=args.max_lr/args.final_div/10)
 
 train_on_test_acc = []
 valid_on_train_acc = []
