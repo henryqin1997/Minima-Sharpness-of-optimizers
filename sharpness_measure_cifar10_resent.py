@@ -9,21 +9,67 @@ import torchvision
 import torchvision.transforms as transforms
 
 import os
+from utils import progress_bar
 import argparse
 import datetime
 
 from models import *
 import json
 
-# ckpt = './checkpoint/ckpt1.pth'
-# ckpt = './checkpoint/novograd0.05_ckptbest.pth'
-ckpt = './checkpoint/sgdwm0.2_ckptbest.pth'
+parser = argparse.ArgumentParser(description='PyTorch CIFAR10 train on test')
+parser.add_argument('--lr', default=1, type=float, help='learning rate')
+parser.add_argument('--resume-best', '-rb', action='store_true',
+                    help='resume from checkpoint')
+parser.add_argument('--resume-worst', '-rw', action='store_true',
+                    help='resume from checkpoint')
+parser.add_argument('--resume-init', '-ri', action='store_true',
+                    help='resume from checkpoint')
+parser.add_argument('--batch-size', type=int, default=128, metavar='N',
+                    help='input batch size for training (default: 128)')
+parser.add_argument('--test-batch-size', type=int, default=128, metavar='N',
+                    help='input batch size for testing (default: 128)')
+parser.add_argument('--warmup-epochs', type=int, default=5, metavar='WE',
+                    help='number of warmup epochs (default: 5)')
+parser.add_argument('--lr-decay', nargs='+', type=int, default=[50, 75],
+                    help='epoch intervals to decay lr')
+parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
+                    help='SGD momentum (default: 0.9)')
+parser.add_argument('--weight-decay', type=float, default=5e-4, metavar='W',
+                    help='SGD weight decay (default: 5e-4)')
+parser.add_argument('--optimizer',type=str,default='sgd',
+                    help='different optimizers')
+parser.add_argument('--epoch',type=int,default=30)
+
+parser.add_argument('--max-lr',default=0.1,type=float)
+parser.add_argument('--div-factor',default=25,type=float)
+parser.add_argument('--final-div',default=10000,type=float)
+
+args = parser.parse_args()
+
+ckptbest = './checkpoint/'+args.optimizer+str(args.max_lr)+'_ckptbest.pth'
+
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 print(torch.__version__)
 
-checkpoint = torch.load(ckpt, map_location=lambda storage, loc: storage)
-checkpoint['net'] = {k[7:]:checkpoint['net'][k] for k in checkpoint['net']}
+net = ResNet50()
+net.to(device)
+
+if args.resume_best:
+    checkpoint = torch.load(ckptbest, map_location=lambda storage, loc: storage)
+    checkpoint['net'] = {k[7:]: checkpoint['net'][k] for k in checkpoint['net']}
+    net.load_state_dict(checkpoint['net'])
+
+# elif args.resume_worst:
+#     checkpoint = torch.load(ckptworst, map_location=lambda storage, loc: storage)
+#     checkpoint['net'] = {k[7:]: checkpoint['net'][k] for k in checkpoint['net']}
+#     net.load_state_dict(checkpoint['net'])
+# elif args.resume_init:
+#     checkpoint = torch.load(ckptinit, map_location=lambda storage, loc: storage)
+#     checkpoint['net'] = {k[7:]: checkpoint['net'][k] for k in checkpoint['net']}
+#     net.load_state_dict(checkpoint['net'])
+
+
 
 transform_test = transforms.Compose([
     transforms.ToTensor(),
@@ -35,10 +81,33 @@ testset = torchvision.datasets.CIFAR10(
 testloader = torch.utils.data.DataLoader(
     testset, batch_size=100, shuffle=False)
 
-net = ResNet50()
-net.to(device)
-net.load_state_dict(checkpoint['net'])
+
+
 criterion = nn.CrossEntropyLoss()
-res,reseps,resori = cal_sharpness(net,testloader,criterion,[1e-4,1e-5,1e-6,-1e-6,-1e-5,-1e-4])
-print(res,reseps,resori)
-json.dump([res,reseps,resori],open('sharpness measure'))
+
+def test(epoch):
+    net.eval()
+    test_loss = 0
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for batch_idx, (inputs, targets) in enumerate(testloader):
+            inputs, targets = inputs.to(device), targets.to(device)
+            outputs = net(inputs)
+            loss = criterion(outputs, targets)
+
+            test_loss += loss.item()
+            _, predicted = outputs.max(1)
+            total += targets.size(0)
+            correct += predicted.eq(targets).sum().item()
+
+            progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+                         % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+
+    # Save checkpoint.
+    print(correct/total)
+
+#res,reseps,resori = cal_sharpness(net,testloader,criterion,[1e-4,1e-5,1e-6,-1e-6,-1e-5,-1e-4])
+#print(res,reseps,resori)
+#json.dump([res,reseps,resori],open('sharpness measure'))
+test(0)
