@@ -52,12 +52,8 @@ transform_test = transforms.Compose([
 trainset = torchvision.datasets.CIFAR10(
     root='/tmp/cifar10', train=True, download=True, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(
-    trainset, batch_size=args.batch_size, shuffle=True, num_workers=2)
+    trainset, batch_size=args.batch_size, shuffle=True)
 
-testset = torchvision.datasets.CIFAR10(
-    root='/tmp/cifar10', train=False, download=True, transform=transform_test)
-testloader = torch.utils.data.DataLoader(
-    testset, batch_size=100, shuffle=False, num_workers=2)
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer',
            'dog', 'frog', 'horse', 'ship', 'truck')
@@ -117,7 +113,7 @@ else:
 def lrs(batch):
     low = math.log2(1e-5)
     high = math.log2(10)
-    return 2**(low+(high-low)*batch/(len(trainloader))/5)
+    return 2**(low+(high-low)*batch/(len(trainloader))/20)
 
 lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer,lrs)
 
