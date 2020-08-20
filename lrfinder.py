@@ -29,6 +29,8 @@ parser.add_argument('--weight-decay', type=float, default=5e-4, metavar='W',
                     help='SGD weight decay (default: 5e-4)')
 parser.add_argument('--optimizer',type=str,default='sgd',
                     help='different optimizers')
+parser.add_argument('--num-epoch', type=int, default=5,
+                    help='input number of epochs (default: 5)')
 args = parser.parse_args()
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -113,7 +115,7 @@ else:
 def lrs(batch):
     low = math.log2(1e-5)
     high = math.log2(10)
-    return 2**(low+(high-low)*batch/(len(trainloader))/20)
+    return 2**(low+(high-low)*batch/(len(trainloader))/args.num_epoch)
 
 lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer,lrs)
 
@@ -147,7 +149,7 @@ def train(epoch):
         trainloss_list.append(float(loss.item()))
 
 
-for epoch in range(20):
+for epoch in range(args.num_epoch):
     train(epoch)
 file = open(args.optimizer+'_batchsize_'+str(args.batch_size)+'_lr_range_find_minibatch.json','w+')
 json.dump(trainloss_list,file)
