@@ -25,10 +25,10 @@ def cal_sharpness(model,data_loader,criterion,epsilon_list=[1e-5]):
     print('acc:'+str(correct/total))
     for eps in epsilon_list:
         optimizer = reverse_sgd.REV_SGD(model.parameters(),epsilon=eps)
-        optimizer.zero_grad()
         sharploss = 0
         print('calculating derivatives')
         model.train()
+        optimizer.zero_grad()
         for batch_idx, (inputs, targets) in enumerate(data_loader):
             print(batch_idx)
             inputs, targets = inputs.to(device), targets.to(device)
@@ -36,6 +36,7 @@ def cal_sharpness(model,data_loader,criterion,epsilon_list=[1e-5]):
             loss = criterion(outputs, targets)
             loss.backward()
         optimizer.step()
+        optimizer.zero_grad()
         print('calculating loss')
         model.eval()
         for batch_idx, (inputs, targets) in enumerate(data_loader):
