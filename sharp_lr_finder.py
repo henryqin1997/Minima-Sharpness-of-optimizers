@@ -80,6 +80,9 @@ print('==> Building model..')
 # net = RegNetX_200MF()
 net = ResNet50()
 net = net.to(device)
+checkpoint = torch.load('./checkpoint/novograd0.05_ckptbest.pth', map_location=lambda storage, loc: storage)
+checkpoint['net'] = {k[7:]: checkpoint['net'][k] for k in checkpoint['net']}
+net.load_state_dict(checkpoint['net'])
 net = torch.nn.DataParallel(net)
 
 
