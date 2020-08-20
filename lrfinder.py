@@ -113,11 +113,12 @@ else:
 # lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
 # lr_scheduler = LambdaLR(optimizer,lrs)
 batch_acumulate = args.batch_size//128
+batch_per_step = len(trainloader)//batch_acumulate+int(len(trainloader)%batch_acumulate>0)
 
 def lrs(batch):
     low = math.log2(1e-5)
     high = math.log2(10)
-    return 2**(low+(high-low)*batch/(len(trainloader)//batch_acumulate+int(len(trainloader)%batch_acumulate>0))/args.num_epoch)
+    return 2**(low+(high-low)*batch/batch_per_step/args.num_epoch)
 
 lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer,lrs)
 
@@ -133,12 +134,12 @@ def train(epoch):
     total = 0
     for batch_idx, (inputs, targets) in enumerate(trainloader):
         inputs, targets = inputs.to(device), targets.to(device)
-        optimizer.zero_grad()
         outputs = net(inputs)
         loss = criterion(outputs, targets)
         loss.backward()
         if batch_idx % batch_acumulate==batch_acumulate-1 or batch_idx==len(trainloader)-1:
             optimizer.step()
+            optimizer.zero_grad()
             lr_scheduler.step()
         print('current lr:' + str(lr_scheduler.get_lr()))
         train_loss += loss.item()
@@ -146,10 +147,10 @@ def train(epoch):
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
 
-        progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+        progress_bar(batch_idx, batch_per_step, 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
-
-        trainloss_list.append(float(loss.item()))
+        if batch_idx % batch_acumulate == batch_acumulate - 1 or batch_idx == len(trainloader) - 1:
+            trainloss_list.append(float(loss.item()))
 
 
 for epoch in range(args.num_epoch):
