@@ -125,7 +125,11 @@ else:
 # lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
 # lr_scheduler = LambdaLR(optimizer,lrs)
 # lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, args.lr_decay, gamma=0.1)
-lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.max_lr,steps_per_epoch=len(trainloader),
+
+batch_acumulate = args.batch_size//128
+batch_per_step = len(trainloader)//batch_acumulate+int(len(trainloader)%batch_acumulate>0)
+
+lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.max_lr,steps_per_epoch=batch_per_step,
                                                    epochs=150,div_factor=args.div_factor,final_div_factor=args.final_div)
 train_acc = []
 valid_acc = []
@@ -135,23 +139,28 @@ def train(epoch):
     print('\nEpoch: %d' % epoch)
     net.train()
     train_loss = 0
+    count = 0
     correct = 0
     total = 0
     for batch_idx, (inputs, targets) in enumerate(trainloader):
         inputs, targets = inputs.to(device), targets.to(device)
-        optimizer.zero_grad()
         outputs = net(inputs)
         loss = criterion(outputs, targets)
         loss.backward()
-        optimizer.step()
-        lr_scheduler.step()
+        if batch_idx % batch_acumulate==batch_acumulate-1 or batch_idx==len(trainloader)-1:
+            optimizer.step()
+            optimizer.zero_grad()
+            lr_scheduler.step()
         train_loss += loss.item()
+        count+=1
         _, predicted = outputs.max(1)
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
 
-        progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                     % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
+        progress_bar(batch_idx, batch_per_step, 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+                     % (train_loss / (count), 100. * correct / total, correct, total))
+        if batch_idx % batch_acumulate == batch_acumulate - 1 or batch_idx == len(trainloader) - 1:
+            train_loss, count = 0, 0
     train_acc.append(correct/total)
 
 def test(epoch):
