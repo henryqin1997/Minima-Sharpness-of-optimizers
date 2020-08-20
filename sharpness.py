@@ -1,4 +1,5 @@
 import torch
+import copy
 import reverse_sgd
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
