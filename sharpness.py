@@ -9,14 +9,20 @@ def cal_sharpness(model,data_loader,criterion,epsilon_list=[1e-5]):
     currentloss = 0
     print('calculating original loss')
     model.eval()
+    total = 0
+    correct = 0
     for batch_idx, (inputs, targets) in enumerate(data_loader):
         print(batch_idx)
         inputs, targets = inputs.to(device), targets.to(device)
         outputs = model(inputs)
+        _, predicted = outputs.max(1)
+        total += targets.size(0)
+        correct += predicted.eq(targets).sum().item()
         loss = criterion(outputs, targets)
         currentloss += loss.item()
     currentloss/=len(data_loader)
     print(currentloss)
+    print('acc:'+str(correct/total))
     for eps in epsilon_list:
         optimizer = reverse_sgd.REV_SGD(model.parameters(),epsilon=eps)
         optimizer.zero_grad()
