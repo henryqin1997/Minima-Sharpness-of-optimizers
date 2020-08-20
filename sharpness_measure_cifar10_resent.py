@@ -79,7 +79,7 @@ transform_test = transforms.Compose([
 testset = torchvision.datasets.CIFAR10(
     root='/tmp/cifar10', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(
-    testset, batch_size=100, shuffle=False)
+    testset, batch_size=128, shuffle=True)
 
 
 
@@ -107,7 +107,9 @@ def test(epoch):
     # Save checkpoint.
     print(correct/total)
 
-#res,reseps,resori = cal_sharpness(net,testloader,criterion,[1e-4,1e-5,1e-6,-1e-6,-1e-5,-1e-4])
-#print(res,reseps,resori)
-#json.dump([res,reseps,resori],open('sharpness measure'))
 test(0)
+res,reseps,resori = cal_sharpness(net,testloader,criterion,[1e-4,1e-5,1e-6,-1e-7,-1e-6,-1e-5,-1e-4])
+print(res)
+print(reseps)
+print(resori)
+json.dump([res,reseps,resori],open('sharpness measure {}_{}.json'.format(args.optimizer,args.max_lr),'w+'))

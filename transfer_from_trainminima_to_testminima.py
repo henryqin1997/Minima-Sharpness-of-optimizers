@@ -73,7 +73,7 @@ trainloader = torch.utils.data.DataLoader(
 testset = torchvision.datasets.CIFAR10(
     root='/tmp/cifar10', train=False, download=True, transform=transform_test)
 testloader = torch.utils.data.DataLoader(
-    testset, batch_size=100, shuffle=False)
+    testset, batch_size=args.batch_size, shuffle=True)
 
 net = ResNet50()
 net.to(device)
@@ -101,13 +101,13 @@ valid_on_train_acc = []
 train_on_test_loss = []
 test_on_train_loss = []
 
-def train_on_test(epoch):
+def train_on_test(epoch,dataloader):
     print('\nTraining on test, Epoch: %d' % epoch)
     net.train()
     train_loss = 0
     correct = 0
     total = 0
-    for batch_idx, (inputs, targets) in enumerate(testloader):
+    for batch_idx, (inputs, targets) in enumerate(dataloader):
         inputs, targets = inputs.to(device), targets.to(device)
         optimizer.zero_grad()
         outputs = net(inputs)
@@ -119,18 +119,18 @@ def train_on_test(epoch):
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
 
-        progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+        progress_bar(batch_idx, len(dataloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
     train_on_test_acc.append(correct / total)
-    train_on_test_loss.append(float(train_loss/len(testloader)))
+    train_on_test_loss.append(float(train_loss/len(dataloader)))
 
-def test_on_train(epoch):
+def test_on_train(epoch,dataloader):
     net.eval()
     test_loss = 0
     correct = 0
     total = 0
     with torch.no_grad():
-        for batch_idx, (inputs, targets) in enumerate(trainloader):
+        for batch_idx, (inputs, targets) in enumerate(dataloader):
             inputs, targets = inputs.to(device), targets.to(device)
             outputs = net(inputs)
             loss = criterion(outputs, targets)
@@ -140,15 +140,15 @@ def test_on_train(epoch):
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
 
-            progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+            progress_bar(batch_idx, len(dataloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                          % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
 
     valid_on_train_acc.append(correct / total)
-    test_on_train_loss.append(test_loss/len(trainloader))
+    test_on_train_loss.append(test_loss/len(dataloader))
 
 for epoch in range(args.epoch):
-    train_on_test(epoch)
-    test_on_train(epoch)
+    train_on_test(epoch,testloader)
+    test_on_train(epoch,trainloader)
 
 file = open(args.optimizer+str(args.max_lr)+'-'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')+'_onecycle_transfer_train_to test_log.json','w+')
 json.dump([train_on_test_acc,valid_on_train_acc,train_on_test_loss,test_on_train_loss],file)
