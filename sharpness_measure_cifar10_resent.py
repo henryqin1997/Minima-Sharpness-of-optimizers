@@ -107,7 +107,7 @@ def test(epoch):
     # Save checkpoint.
     print(correct/total)
 
-test(0)
+# test(0)
 res,reseps,resori = cal_sharpness(net,testloader,criterion,[1e-4,1e-5,1e-6,-1e-7,-1e-6,-1e-5,-1e-4])
 print(res)
 print(reseps)
