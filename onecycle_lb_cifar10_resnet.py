@@ -3,34 +3,41 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
-import math
 
 import torchvision
 import torchvision.transforms as transforms
 
 import os
 import argparse
+import datetime
 
 from models import *
 from utils import progress_bar
-from torch.optim.lr_scheduler import LambdaLR
 import json
 
 
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=1, type=float, help='learning rate')
+parser.add_argument('--resume', '-r', action='store_true',
+                    help='resume from checkpoint')
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
-                    help='input batch size for training, please use multiple of 128 (default: 128)')
+                    help='input batch size for training (default: 128)')
 parser.add_argument('--test-batch-size', type=int, default=128, metavar='N',
                     help='input batch size for testing (default: 128)')
+parser.add_argument('--warmup-epochs', type=int, default=5, metavar='WE',
+                    help='number of warmup epochs (default: 5)')
+parser.add_argument('--lr-decay', nargs='+', type=int, default=[50, 75],
+                    help='epoch intervals to decay lr')
 parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
                     help='SGD momentum (default: 0.9)')
 parser.add_argument('--weight-decay', type=float, default=5e-4, metavar='W',
                     help='SGD weight decay (default: 5e-4)')
 parser.add_argument('--optimizer',type=str,default='sgd',
                     help='different optimizers')
-parser.add_argument('--num-epoch', type=int, default=5,
-                    help='input number of epochs (default: 5)')
+parser.add_argument('--max-lr',default=0.1,type=float)
+parser.add_argument('--div-factor',default=25,type=float)
+parser.add_argument('--final-div',default=10000,type=float)
+
 args = parser.parse_args()
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -54,8 +61,12 @@ transform_test = transforms.Compose([
 trainset = torchvision.datasets.CIFAR10(
     root='/tmp/cifar10', train=True, download=True, transform=transform_train)
 trainloader = torch.utils.data.DataLoader(
-    trainset, batch_size=128, shuffle=True)
+    trainset, batch_size=args.batch_size)
 
+testset = torchvision.datasets.CIFAR10(
+    root='/tmp/cifar10', train=False, download=True, transform=transform_test)
+testloader = torch.utils.data.DataLoader(
+    testset, batch_size=100, shuffle=False)
 
 classes = ('plane', 'car', 'bird', 'cat', 'deer',
            'dog', 'frog', 'horse', 'ship', 'truck')
@@ -78,8 +89,9 @@ print('==> Building model..')
 # net = RegNetX_200MF()
 net = ResNet50()
 net = net.to(device)
-net = torch.nn.DataParallel(net)
-
+if device == 'cuda':
+    net = torch.nn.DataParallel(net)
+    cudnn.benchmark = True
 
 criterion = nn.CrossEntropyLoss()
 if args.optimizer.lower()=='sgd':
@@ -112,18 +124,11 @@ else:
                           weight_decay=args.weight_decay)
 # lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
 # lr_scheduler = LambdaLR(optimizer,lrs)
-batch_acumulate = args.batch_size//128
-batch_per_step = len(trainloader)//batch_acumulate+int(len(trainloader)%batch_acumulate>0)
-
-def lrs(batch):
-    low = math.log2(1e-5)
-    high = math.log2(10)
-    return 2**(low+(high-low)*batch/batch_per_step/args.num_epoch)
-
-lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer,lrs)
-
-trainloss_list = []
-loss_list = []
+# lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, args.lr_decay, gamma=0.1)
+lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.max_lr,steps_per_epoch=len(trainloader),
+                                                   epochs=150,div_factor=args.div_factor,final_div_factor=args.final_div)
+train_acc = []
+valid_acc = []
 
 # Training
 def train(epoch):
@@ -132,31 +137,47 @@ def train(epoch):
     train_loss = 0
     correct = 0
     total = 0
-    count = 0
     for batch_idx, (inputs, targets) in enumerate(trainloader):
         inputs, targets = inputs.to(device), targets.to(device)
+        optimizer.zero_grad()
         outputs = net(inputs)
         loss = criterion(outputs, targets)
         loss.backward()
-        if batch_idx % batch_acumulate==batch_acumulate-1 or batch_idx==len(trainloader)-1:
-            optimizer.step()
-            optimizer.zero_grad()
-            lr_scheduler.step()
-        print('current lr:' + str(lr_scheduler.get_lr()))
+        optimizer.step()
+        lr_scheduler.step()
         train_loss += loss.item()
-        count += 1
         _, predicted = outputs.max(1)
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
 
-        progress_bar(batch_idx, batch_per_step, 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                     % (train_loss/(count), 100.*correct/total, correct, total))
-        if batch_idx % batch_acumulate == batch_acumulate - 1 or batch_idx == len(trainloader) - 1:
-            trainloss_list.append(float(train_loss/count))
-            train_loss,count=0,0
+        progress_bar(batch_idx, len(trainloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+                     % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
+    train_acc.append(correct/total)
 
+def test(epoch):
+    net.eval()
+    test_loss = 0
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for batch_idx, (inputs, targets) in enumerate(testloader):
+            inputs, targets = inputs.to(device), targets.to(device)
+            outputs = net(inputs)
+            loss = criterion(outputs, targets)
 
-for epoch in range(args.num_epoch):
+            test_loss += loss.item()
+            _, predicted = outputs.max(1)
+            total += targets.size(0)
+            correct += predicted.eq(targets).sum().item()
+
+            progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+                         % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
+
+    # Save checkpoint.
+    valid_acc.append(correct/total)
+
+for epoch in range(150):
     train(epoch)
-file = open(args.optimizer+'_batchsize_'+str(args.batch_size)+'_lr_range_find_minibatch.json','w+')
-json.dump(trainloss_list,file)
+    test(epoch)
+file = open(args.optimizer+str(args.max_lr/args.div_factor)+'-'+str(args.max_lr)+'-'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')+'_onecycle_log.json','w+')
+json.dump([train_acc,valid_acc],file)
