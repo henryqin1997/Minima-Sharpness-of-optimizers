@@ -20,7 +20,7 @@ import json
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--lr', default=1, type=float, help='learning rate')
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
-                    help='input batch size for training (default: 128)')
+                    help='input batch size for training, please use multiple of 128 (default: 128)')
 parser.add_argument('--test-batch-size', type=int, default=128, metavar='N',
                     help='input batch size for testing (default: 128)')
 parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
@@ -112,10 +112,12 @@ else:
                           weight_decay=args.weight_decay)
 # lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
 # lr_scheduler = LambdaLR(optimizer,lrs)
+batch_acumulate = args.batch_size//128
+
 def lrs(batch):
     low = math.log2(1e-5)
     high = math.log2(10)
-    return 2**(low+(high-low)*batch/(len(trainloader))/args.num_epoch)
+    return 2**(low+(high-low)*batch/(len(trainloader)//batch_acumulate+int(len(trainloader)%batch_acumulate>0))/args.num_epoch)
 
 lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer,lrs)
 
@@ -135,8 +137,9 @@ def train(epoch):
         outputs = net(inputs)
         loss = criterion(outputs, targets)
         loss.backward()
-        optimizer.step()
-        lr_scheduler.step()
+        if batch_idx % batch_acumulate==batch_acumulate-1 or batch_idx==len(trainloader)-1:
+            optimizer.step()
+            lr_scheduler.step()
         print('current lr:' + str(lr_scheduler.get_lr()))
         train_loss += loss.item()
         _, predicted = outputs.max(1)
