@@ -132,6 +132,7 @@ def train(epoch):
     train_loss = 0
     correct = 0
     total = 0
+    count = 0
     for batch_idx, (inputs, targets) in enumerate(trainloader):
         inputs, targets = inputs.to(device), targets.to(device)
         outputs = net(inputs)
@@ -143,6 +144,7 @@ def train(epoch):
             lr_scheduler.step()
         print('current lr:' + str(lr_scheduler.get_lr()))
         train_loss += loss.item()
+        count += 1
         _, predicted = outputs.max(1)
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
@@ -150,7 +152,8 @@ def train(epoch):
         progress_bar(batch_idx, batch_per_step, 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                      % (train_loss/(batch_idx+1), 100.*correct/total, correct, total))
         if batch_idx % batch_acumulate == batch_acumulate - 1 or batch_idx == len(trainloader) - 1:
-            trainloss_list.append(float(loss.item()))
+            trainloss_list.append(float(train_loss/count))
+            train_loss,count=0,0
 
 
 for epoch in range(args.num_epoch):
