@@ -5,8 +5,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 def cal_sharpness(model,data_loader,criterion,epsilon_list=[1e-5]):
     #consider add one more, with eps(1+max(x)) as denominator
     res,res_eps,res_original = [],[],[]
-    params = model.state_dict()
-    deep_copy_params = {k:params[k] for k in params}
+    deep_copy_params = copy.deepcopy(model.state_dict())
     for eps in epsilon_list:
         currentloss = 0
         print('calculating original loss')
