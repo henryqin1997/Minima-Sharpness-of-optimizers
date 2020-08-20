@@ -108,7 +108,7 @@ def test(epoch):
     print(correct/total)
 
 # test(0)
-res,reseps,resori = cal_sharpness(net,testloader,criterion,[1e-7,1e-8,1e-9,-1e-7,-1e-6,-1e-5,-1e-4])
+res,reseps,resori = cal_sharpness(net,testloader,criterion,[-1e-4])
 print(res)
 print(reseps)
 print(resori)
