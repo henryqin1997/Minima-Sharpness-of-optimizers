@@ -6,13 +6,13 @@ def cal_sharpness(model,data_loader,criterion,epsilon_list=[1e-5]):
     #consider add one more, with eps(1+max(x)) as denominator
     res,res_eps,res_original = [],[],[]
     params = model.state_dict()
+    deep_copy_params = {k:params[k] for k in params}
     currentloss = 0
     print('calculating original loss')
     model.eval()
     total = 0
     correct = 0
     for batch_idx, (inputs, targets) in enumerate(data_loader):
-        print(batch_idx)
         inputs, targets = inputs.to(device), targets.to(device)
         outputs = model(inputs)
         _, predicted = outputs.max(1)
@@ -30,7 +30,6 @@ def cal_sharpness(model,data_loader,criterion,epsilon_list=[1e-5]):
         model.train()
         optimizer.zero_grad()
         for batch_idx, (inputs, targets) in enumerate(data_loader):
-            print(batch_idx)
             inputs, targets = inputs.to(device), targets.to(device)
             outputs = model(inputs)
             loss = criterion(outputs, targets)
@@ -40,7 +39,6 @@ def cal_sharpness(model,data_loader,criterion,epsilon_list=[1e-5]):
         print('calculating loss')
         model.eval()
         for batch_idx, (inputs, targets) in enumerate(data_loader):
-            print(batch_idx)
             inputs, targets = inputs.to(device), targets.to(device)
             outputs = model(inputs)
             loss = criterion(outputs, targets)
@@ -50,6 +48,6 @@ def cal_sharpness(model,data_loader,criterion,epsilon_list=[1e-5]):
         res.append((sharploss-currentloss)/(1+currentloss))
         res_eps.append((sharploss-currentloss)/(1+currentloss)/eps)
         res_original.append(sharploss)
-        model.load_state_dict(params)
+        model.load_state_dict(deep_copy_params)
     return res,res_eps,res_original
 
