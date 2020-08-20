@@ -75,6 +75,17 @@ transform_test = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
 ])
+transform_train = transforms.Compose([
+    transforms.RandomCrop(32, padding=4),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+])
+trainset = torchvision.datasets.CIFAR10(
+    root='/tmp/cifar10', train=True, download=True, transform=transform_train)
+trainloader = torch.utils.data.DataLoader(
+    trainset, batch_size=args.batch_size, shuffle=True)
+
 
 testset = torchvision.datasets.CIFAR10(
     root='/tmp/cifar10', train=False, download=True, transform=transform_test)
@@ -106,10 +117,26 @@ def test(epoch):
 
     # Save checkpoint.
     print(correct/total)
+def test_on_train(epoch,dataloader):
+    net.eval()
+    test_loss = 0
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for batch_idx, (inputs, targets) in enumerate(dataloader):
+            inputs, targets = inputs.to(device), targets.to(device)
+            outputs = net(inputs)
+            loss = criterion(outputs, targets)
 
-# test(0)
-res,reseps,resori = cal_sharpness(net,testloader,criterion,[1e-4,1e-5,1e-6,1e-7,1e-8,1e-9,1e-10])
-print(res)
-print(reseps)
-print(resori)
-json.dump([res,reseps,resori],open('sharpness measure {}_{}.json'.format(args.optimizer,args.max_lr),'w+'))
+            test_loss += loss.item()
+            _, predicted = outputs.max(1)
+            total += targets.size(0)
+            correct += predicted.eq(targets).sum().item()
+
+            progress_bar(batch_idx, len(dataloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+                         % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
+test(0)
+test_on_train(0,trainloader)
+#res,reseps,resori = cal_sharpness(net,testloader,criterion,[1e-4,1e-5,1e-6,1e-7,1e-8,1e-9,1e-10])
+
+#json.dump([res,reseps,resori],open('sharpness measure {}_{}.json'.format(args.optimizer,args.max_lr),'w+'))
