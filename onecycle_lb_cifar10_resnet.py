@@ -156,10 +156,9 @@ def train(epoch):
         _, predicted = outputs.max(1)
         total += targets.size(0)
         correct += predicted.eq(targets).sum().item()
-
-        progress_bar(batch_idx, batch_per_step, 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                     % (train_loss / (count), 100. * correct / total, correct, total))
         if batch_idx % batch_acumulate == batch_acumulate - 1 or batch_idx == len(trainloader) - 1:
+            progress_bar(batch_idx//batch_acumulate if batch_idx!=len(trainloader) - 1 else batch_per_step, batch_per_step, 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+                     % (train_loss / (count), 100. * correct / total, correct, total))
             train_loss, count = 0, 0
     train_acc.append(correct/total)
 

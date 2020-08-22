@@ -23,11 +23,11 @@ name_list = ['sgd','sgdwm','rmsprop','adagrad','adam','radam','lars','lamb','nov
 
 
 #original curve
-for opt in name_list[2:3]:
+for opt in name_list[:1]:
     # trainloss = json.load(open('lr_range_test_data/'+opt+'_lr_range_find_minibatch.json'))
     trainloss = json.load(open(opt+'_batchsize_8192_lr_range_find_minibatch.json'))
-    x = [2**(low+(high-low)*i/len(trainloss)) for i in range(int(len(trainloss)*(log_neg_one+1-low)/(high-low)))]
-    y = trainloss[:int(len(trainloss)*(log_neg_one+1-low)/(high-low))]
+    x = [2**(low+(high-low)*i/len(trainloss)) for i in range(int(len(trainloss)*(log_neg_one-low)/(high-low)))]
+    y = trainloss[:int(len(trainloss)*(log_neg_one-low)/(high-low))]
     i = trainloss.index(min(trainloss))
     print(i, 2 ** (low + (high - low) * i / len(trainloss)))
     plt.plot(x,y)
