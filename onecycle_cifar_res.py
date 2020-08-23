@@ -180,5 +180,5 @@ def test(epoch):
 for epoch in range(args.num_epoch):
     train(epoch)
     test(epoch)
-file = open(args.optimizer+str(args.max_lr/args.div_factor)+'-'+str(args.max_lr)+'-'+'batchsize'+str(args.num_epoch)+'-'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')+'_onecycle_log.json','w+')
+file = open(args.optimizer+str(args.max_lr/args.div_factor)+'-'+str(args.max_lr)+'-'+'epoch'+str(args.num_epoch)+'-'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')+'_onecycle_log.json','w+')
 json.dump([train_acc,valid_acc],file)
