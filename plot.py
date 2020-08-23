@@ -17,7 +17,7 @@ color = ['r','g','b','c','y','k','m','violet','orange']
 
 markers = ['.','^','2','s','p','*','+','x','D']
 
-dir = 'logs/'
+dir = 'logs-kfac/'
 #dir = 'cifar_resnet_lbloss/'
 
 # for i,name in enumerate(name_list):
