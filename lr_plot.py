@@ -140,4 +140,6 @@ for epoch in range(150):
     train(epoch)
 
 plt.plot(lr_list)
+plt.xlabel('batch iteration')
+plt.ylabel('learning_rate')
 plt.show()
