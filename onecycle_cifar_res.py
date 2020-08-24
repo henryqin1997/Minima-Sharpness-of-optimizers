@@ -38,6 +38,7 @@ parser.add_argument('--max-lr',default=0.1,type=float)
 parser.add_argument('--div-factor',default=25,type=float)
 parser.add_argument('--final-div',default=10000,type=float)
 parser.add_argument('--num-epoch',default=150,type=int)
+parser.add_argument('--pct-start',default=0.3,type=float)
 
 args = parser.parse_args()
 
@@ -127,7 +128,7 @@ else:
 # lr_scheduler = LambdaLR(optimizer,lrs)
 # lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, args.lr_decay, gamma=0.1)
 lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.max_lr,steps_per_epoch=len(trainloader),
-                                                   epochs=args.num_epoch,div_factor=args.div_factor,final_div_factor=args.final_div)
+                                                   epochs=args.num_epoch,div_factor=args.div_factor,final_div_factor=args.final_div,pct_start=args.pct_start)
 train_acc = []
 valid_acc = []
 
@@ -180,5 +181,7 @@ def test(epoch):
 for epoch in range(args.num_epoch):
     train(epoch)
     test(epoch)
-file = open(args.optimizer+str(args.max_lr/args.div_factor)+'-'+str(args.max_lr)+'-'+'epoch'+str(args.num_epoch)+'-'+datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')+'_onecycle_log.json','w+')
+fn = '{}{}-{}-epoch{}-batchsize{}-pct{}-{}_onecycle_log.json'.format(args.optimizer,str(args.max_lr/args.div_factor),
+                            str(args.max_lr),args.num_epoch,args.batch_size,args.pct_start,datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+file = open(fn,'w+')
 json.dump([train_acc,valid_acc],file)
