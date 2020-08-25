@@ -138,4 +138,4 @@ def test_on_train(epoch,dataloader):
 
 res,reseps,resori = cal_sharpness(net,testloader,criterion,[1e-3,5e-4,1e-4,1e-5,1e-6])
 
-json.dump([res,reseps,resori],open('sharpness measure {}_{}.json'.format(args.optimizer,args.max_lr),'w+'))
+json.dump([res,reseps,resori],open('sharpness_measure_{}_{}.json'.format(args.optimizer,args.max_lr),'w+'))
