@@ -58,6 +58,7 @@ net.to(device)
 if args.resume_best:
     checkpoint = torch.load(ckptbest, map_location=lambda storage, loc: storage)
     checkpoint['net'] = {k[7:]: checkpoint['net'][k] for k in checkpoint['net']}
+    print("best acc",checkpoint['acc'])
     net.load_state_dict(checkpoint['net'])
 
 # elif args.resume_worst:
