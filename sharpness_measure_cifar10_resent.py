@@ -16,8 +16,8 @@ import datetime
 from models import *
 import json
 
-parser = argparse.ArgumentParser(description='PyTorch CIFAR10 train on test')
-parser.add_argument('--lr', default=1, type=float, help='learning rate')
+parser = argparse.ArgumentParser(description='PyTorch CIFAR10 sharpness measure')
+
 parser.add_argument('--resume-best', '-rb', action='store_true',
                     help='resume from checkpoint')
 parser.add_argument('--resume-worst', '-rw', action='store_true',
@@ -38,15 +38,19 @@ parser.add_argument('--weight-decay', type=float, default=5e-4, metavar='W',
                     help='SGD weight decay (default: 5e-4)')
 parser.add_argument('--optimizer',type=str,default='sgd',
                     help='different optimizers')
-parser.add_argument('--epoch',type=int,default=30)
+parser.add_argument('--lb',action='store_true',
+                    help='resume form lb checkpoint')
+
 
 parser.add_argument('--max-lr',default=0.1,type=float)
 parser.add_argument('--div-factor',default=25,type=float)
 parser.add_argument('--final-div',default=10000,type=float)
 
 args = parser.parse_args()
-
-ckptbest = './checkpoint/'+args.optimizer+str(args.max_lr)+'_ckptbest.pth'
+if not args.lb:
+    ckptbest = './checkpoint/'+args.optimizer+str(args.max_lr)+'_ckptbest.pth'
+else:
+    ckptbest = './checkpoint/' + args.optimizer +'_lb_'+ str(args.max_lr) + '_ckptbest.pth'
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 

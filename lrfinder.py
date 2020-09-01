@@ -100,7 +100,7 @@ elif args.optimizer.lower() == 'radam':
     optimizer = RAdam(net.parameters(),lr=args.lr,weight_decay=args.weight_decay)
 elif args.optimizer.lower() == 'lars':#no tensorboardX
     from lars import LARS
-    optimizer = LARS(net.parameters(), lr=args.lr,momentum=args.momentum,weight_decay=args.weight_decay)
+    optimizer = LARS(net.parameters(), lr=args.lr,momentum=args.momentum,weight_decay=1e-4)
 elif args.optimizer.lower() == 'lamb':
     from lamb import Lamb
     optimizer  = Lamb(net.parameters(),lr=args.lr,weight_decay=args.weight_decay)
