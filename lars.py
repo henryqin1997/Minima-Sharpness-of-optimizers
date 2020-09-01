@@ -67,7 +67,7 @@ class LARS(Optimizer):
                     continue
                 w_norm = torch.norm(p.data)
                 g_norm = torch.norm(p.grad.data)
-                if w_norm * g_norm > 0:
+                if torch.gt(w_norm,0) and torch.gt(g_norm,0):
                     local_lr = eta * w_norm / (g_norm +
                         weight_decay * w_norm + epsilon)
                 else:

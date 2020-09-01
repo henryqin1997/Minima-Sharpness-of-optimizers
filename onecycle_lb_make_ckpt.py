@@ -137,9 +137,6 @@ lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.max_lr,steps_p
 train_acc = []
 valid_acc = []
 
-ckptbest = './checkpoint/'+args.optimizer+'_lb_'+str(args.max_lr)+'_ckptbest.pth'
-ckptworst = './checkpoint/'+args.optimizer+'_lb_'+str(args.max_lr)+'_ckptworst.pth'
-
 # Training
 def train(epoch):
     print('\nEpoch: %d' % epoch)
@@ -169,7 +166,6 @@ def train(epoch):
     train_acc.append(correct/total)
 
 def test(epoch):
-    global best_acc
     net.eval()
     test_loss = 0
     correct = 0
@@ -190,29 +186,6 @@ def test(epoch):
 
     # Save checkpoint.
     valid_acc.append(correct/total)
-    acc = 100. * correct / total
-    if acc > best_acc:
-        print('Saving..')
-        state = {
-            'net': net.state_dict(),
-            'acc': acc,
-            'epoch': epoch,
-        }
-        if not os.path.isdir('checkpoint'):
-            os.mkdir('checkpoint')
-        torch.save(state, ckptbest)
-        best_acc = acc
-    valid_acc.append(correct / total)
-    if train_acc[-1] - valid_acc[-1] > 0.5:
-        print('Saving..')
-        state = {
-            'net': net.state_dict(),
-            'acc': acc,
-            'epoch': epoch,
-        }
-        if not os.path.isdir('checkpoint'):
-            os.mkdir('checkpoint')
-        torch.save(state, ckptworst)
 
 for epoch in range(args.num_epoch):
     train(epoch)
