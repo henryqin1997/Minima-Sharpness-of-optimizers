@@ -9,7 +9,6 @@ import torchvision
 import torchvision.transforms as transforms
 
 import os
-from utils import progress_bar
 import argparse
 import datetime
 
