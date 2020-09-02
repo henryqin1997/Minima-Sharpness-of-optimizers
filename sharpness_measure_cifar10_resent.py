@@ -11,6 +11,7 @@ import torchvision.transforms as transforms
 import os
 import argparse
 import datetime
+from utils import progress_bar
 
 from models import *
 import json
@@ -116,8 +117,6 @@ def test(epoch):
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
 
-            progress_bar(batch_idx, len(testloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
-                         % (test_loss/(batch_idx+1), 100.*correct/total, correct, total))
 
     # Save checkpoint.
     print(correct/total)
@@ -140,7 +139,7 @@ def test_on_train(epoch,dataloader):
             progress_bar(batch_idx, len(dataloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                          % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
 
-res,reseps,resori = cal_sharpness(net,testloader,criterion,[1e-3,5e-4,1e-4,1e-5,1e-6])
+res,reseps,resori = cal_sharpness(net,testloader,criterion,[1e-3,5e-4,1e-4,1e-5,1e-6,-1e-6,-1e-5,-1e-4,-5e-4,-1e-3])
 if not args.lb:
     json.dump([res,reseps,resori],open('sharpness_measure_{}_{}.json'.format(args.optimizer,args.max_lr),'w+'))
 else:
