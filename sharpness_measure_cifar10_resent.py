@@ -64,6 +64,9 @@ if args.resume_best:
     checkpoint['net'] = {k[7:]: checkpoint['net'][k] for k in checkpoint['net']}
     print("best acc",checkpoint['acc'])
     net.load_state_dict(checkpoint['net'])
+else:
+    print('not resuming from best')
+    exit(1)
 
 # elif args.resume_worst:
 #     checkpoint = torch.load(ckptworst, map_location=lambda storage, loc: storage)
@@ -141,6 +144,6 @@ def test_on_train(epoch,dataloader):
 
 res,reseps,resori,original_loss = cal_sharpness(net,testloader,criterion,[5e-4,2e-4,1e-4,5e-5,1e-5,1e-6,-1e-6,-1e-5,-5e-5,-2e-4,-1e-4,-5e-4])
 if not args.lb:
-    json.dump([res,reseps,resori,original_loss],open('sharpness_measure_{}_{}.json'.format(args.optimizer,args.max_lr),'w+'))
+    json.dump([res,reseps,resori,original_loss,checkpoint['acc']],open('sharpness_measure_{}_{}.json'.format(args.optimizer,args.max_lr),'w+'))
 else:
-    json.dump([res, reseps, resori,original_loss], open('sharpness_measure_lb_{}_{}.json'.format(args.optimizer, args.max_lr), 'w+'))
+    json.dump([res, reseps, resori,original_loss,checkpoint['acc']], open('sharpness_measure_lb_{}_{}.json'.format(args.optimizer, args.max_lr), 'w+'))
