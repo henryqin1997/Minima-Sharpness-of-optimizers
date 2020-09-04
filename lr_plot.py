@@ -24,7 +24,7 @@ parser.add_argument('--test-batch-size', type=int, default=128, metavar='N',
                     help='input batch size for testing (default: 128)')
 parser.add_argument('--warmup-epochs', type=int, default=5, metavar='WE',
                     help='number of warmup epochs (default: 5)')
-parser.add_argument('--lr-decay', nargs='+', type=int, default=[50, 75],
+parser.add_argument('--lr-decay', nargs='+', type=int, default=[25, 50, 75],
                     help='epoch intervals to decay lr')
 parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
                     help='SGD momentum (default: 0.9)')
@@ -32,7 +32,7 @@ parser.add_argument('--weight-decay', type=float, default=5e-4, metavar='W',
                     help='SGD weight decay (default: 5e-4)')
 parser.add_argument('--optimizer',type=str,default='sgd',
                     help='different optimizers')
-parser.add_argument('--max-lr',default=0.1,type=float)
+parser.add_argument('--max-lr',default=1,type=float)
 parser.add_argument('--div-factor',default=25,type=float)
 parser.add_argument('--final-div',default=10000,type=float)
 
@@ -122,9 +122,9 @@ else:
                           weight_decay=args.weight_decay)
 # lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
 # lr_scheduler = LambdaLR(optimizer,lrs)
-# lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, args.lr_decay, gamma=0.1)
-lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.max_lr,steps_per_epoch=len(trainloader),
-                                                   epochs=150,div_factor=args.div_factor,final_div_factor=args.final_div)
+lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, args.lr_decay, gamma=0.25)
+#lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.max_lr,steps_per_epoch=len(trainloader), anneal_strategy = 'linear',
+#                                                   epochs=150,div_factor=args.div_factor,final_div_factor=args.final_div, pct_start = 0.1)
 train_acc = []
 valid_acc = []
 
@@ -137,9 +137,12 @@ def train(epoch):
         lr_list.append(lr_scheduler.get_last_lr())
 
 for epoch in range(150):
-    train(epoch)
+    #train(epoch)
+    lr_scheduler.step()
+    lr_list.append(lr_scheduler.get_last_lr())
 
 plt.plot(lr_list)
-plt.xlabel('batch iteration')
+plt.title('Multistep')
+plt.xlabel('epoch')
 plt.ylabel('learning_rate')
 plt.show()
