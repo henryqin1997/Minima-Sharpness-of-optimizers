@@ -49,5 +49,5 @@ def cal_sharpness(model,data_loader,criterion,epsilon_list=[1e-5]):
         res_eps.append((sharploss-currentloss)/eps)
         res_original.append(sharploss)
         model.load_state_dict(deep_copy_params)
-    return res,res_eps,res_original
+    return res,res_eps,res_original,currentloss
 
