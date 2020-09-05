@@ -115,10 +115,15 @@ else:
 batch_acumulate = args.batch_size//128
 batch_per_step = len(trainloader)//batch_acumulate+int(len(trainloader)%batch_acumulate>0)
 
+# def lrs(batch):
+#     low = math.log2(1e-5)
+#     high = math.log2(10)
+#     return 2**(low+(high-low)*batch/batch_per_step/args.num_epoch)
+
 def lrs(batch):
     low = math.log2(1e-5)
     high = math.log2(10)
-    return 2**(low+(high-low)*batch/batch_per_step/args.num_epoch)
+    return low + (high - low) * batch / batch_per_step / args.num_epoch
 
 lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer,lrs)
 
