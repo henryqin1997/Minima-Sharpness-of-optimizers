@@ -23,9 +23,9 @@ name_list = ['sgd','sgdwm','rmsprop','adagrad','adam','radam','lars','lamb','nov
 
 
 # original curve large batch
-for opt in name_list[8:9]:
+for opt in name_list[6:7]:
     # trainloss = json.load(open('lr_range_test_data/'+opt+'_lr_range_find_minibatch.json'))
-    trainloss = json.load(open('lbonecyclelog/'+opt+'_batchsize_8192_lr_range_find_minibatch.json'))
+    trainloss = json.load(open(opt+'_batchsize_8192_lr_range_find_minibatch.json'))
     x = [2**(low+(high-low)*i/len(trainloss)) for i in range(int(len(trainloss)*(0-low)/(high-low)))]
     y = trainloss[:int(len(trainloss)*(0-low)/(high-low))]
     i = trainloss.index(min(trainloss))
