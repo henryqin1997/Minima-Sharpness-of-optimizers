@@ -4,6 +4,7 @@ from lars import LARS
 from lamb import Lamb
 from radam import RAdam
 from novograd import NovoGrad
+import math
 # import torch.distributed as dist
 import argparse
 import sys
@@ -57,8 +58,8 @@ optname = args.optimizer if len(sys.argv)>=2 else 'sgd'
 # log = open(optname+'log.txt','w+')
 
 def lrs(batch):
-    low = 1e-5
-    high = 10
+    low = math.log2(1e-5)
+    high = math.log2(10)
     return 2**(low+(high-low)*batch/len(train_loader)/args.epochs)
 
 lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer,lrs)
