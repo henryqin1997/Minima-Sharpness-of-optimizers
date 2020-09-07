@@ -31,25 +31,25 @@ args = parser.parse_args()
 
 
 if args.optimizer.lower()=='adam':
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1)
 elif args.optimizer.lower()=='sgd':
-    optimizer = optim.SGD(model.parameters(), lr=args.lr)
+    optimizer = optim.SGD(model.parameters(), lr=1)
 elif args.optimizer.lower()=='sgdwm':
-    optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(), lr=1, momentum=0.9)
 elif args.optimizer.lower() == 'rmsprop':
-    optimizer = optim.RMSprop(model.parameters(),lr=args.lr, momentum=0.9)
+    optimizer = optim.RMSprop(model.parameters(),lr=1, momentum=0.9)
 elif args.optimizer.lower() == 'adagrad':
-    optimizer = optim.Adagrad(model.parameters(), lr=args.lr)
+    optimizer = optim.Adagrad(model.parameters(), lr=1)
 elif args.optimizer.lower() == 'radam':
-    optimizer = RAdam(model.parameters(),lr=args.lr)
+    optimizer = RAdam(model.parameters(),lr=1)
 elif args.optimizer.lower() == 'lars':#no tensorboardX
-    optimizer = LARS(model.parameters(), lr=args.lr, momentum=0.9)
+    optimizer = LARS(model.parameters(), lr=1, momentum=0.9)
 elif args.optimizer.lower() == 'lamb':
-    optimizer  = Lamb(model.parameters(),lr=args.lr)
+    optimizer  = Lamb(model.parameters(),lr=1)
 elif args.optimizer.lower() == 'novograd':
-    optimizer = NovoGrad(model.parameters(), lr=args.lr, weight_decay=0.0001)
+    optimizer = NovoGrad(model.parameters(), lr=1, weight_decay=0.0001)
 else:
-    optimizer = optim.SGD(model.parameters(), lr=0.01)
+    optimizer = optim.SGD(model.parameters(), lr=1)
 
 optname = args.optimizer if len(sys.argv)>=2 else 'sgd'
 
@@ -57,7 +57,7 @@ optname = args.optimizer if len(sys.argv)>=2 else 'sgd'
 
 criterion = nn.CrossEntropyLoss()
 
-lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.max_lr,steps_per_epoch=len(train_loader),
+lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.lr,steps_per_epoch=len(train_loader),
                                                    epochs=args.epochs)
 
 model, optimizer, _ = training_loop(model, criterion, optimizer, train_loader, valid_loader, N_EPOCHS, DEVICE,lr_scheduler)
