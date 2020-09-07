@@ -22,7 +22,7 @@ parser.add_argument('-g', '--gpus', default=1, type=int,
                     help='number of gpus per node')
 parser.add_argument('-nr', '--nr', default=0, type=int,
                     help='ranking within the nodes')
-parser.add_argument('--epochs', default=3, type=int,
+parser.add_argument('--epochs', default=5, type=int,
                     metavar='N',
                     help='number of total epochs to run')
 parser.add_argument('-p','--optimizer',default='sgd',type=str,
