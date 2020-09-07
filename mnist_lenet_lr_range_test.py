@@ -59,7 +59,7 @@ optname = args.optimizer if len(sys.argv)>=2 else 'sgd'
 def lrs(batch):
     low = 1e-5
     high = 10
-    return 2**(low+(high-low)*batch/len(train_loader)/args.num_epoch)
+    return 2**(low+(high-low)*batch/len(train_loader)/args.epochs)
 
 lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer,lrs)
 
