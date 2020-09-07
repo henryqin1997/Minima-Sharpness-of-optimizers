@@ -62,5 +62,5 @@ lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.lr,steps_per_e
 
 model, optimizer, _ = training_loop(model, criterion, optimizer, train_loader, valid_loader, N_EPOCHS, DEVICE,lr_scheduler)
 
-with open(optname+str(args.lr)+'_onecycle_loss.txt','w+') as myfile:
+with open(optname+str(args.lr)+'_batchsize_'+str(BATCH_SIZE)+'_onecycle_loss.txt','w+') as myfile:
     json.dump(_,myfile)
