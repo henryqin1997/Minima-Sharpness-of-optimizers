@@ -29,7 +29,7 @@ parser.add_argument('--weight-decay', type=float, default=5e-4, metavar='W',
                     help='SGD weight decay (default: 5e-4)')
 parser.add_argument('--optimizer',type=str,default='sgd',
                     help='different optimizers')
-parser.add_argument('--num-epoch', type=int, default=5,
+parser.add_argument('--num-epoch', type=int, default=6,
                     help='input number of epochs (default: 5)')
 args = parser.parse_args()
 
@@ -125,7 +125,7 @@ def lrs(batch):
 #     high = 10
 #     return low + (high - low) * batch / batch_per_step / args.num_epoch
 #
-# lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer,lrs)
+lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer,lrs)
 
 trainloss_list = []
 loss_list = []

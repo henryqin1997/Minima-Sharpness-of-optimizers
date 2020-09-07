@@ -100,5 +100,5 @@ for i in range(args.epochs):
     print(i)
     train(train_loader,model,criterion,optimizer,'cuda',lr_scheduler)
 
-with open('mnist_lenet_batchsize32_'+args.optimizer+'.json','w+') as f:
+with open('mnist_lenet_batchsize_'+str(BATCH_SIZE)+args.optimizer+'.json','w+') as f:
     json.dump(loss_list,f)
