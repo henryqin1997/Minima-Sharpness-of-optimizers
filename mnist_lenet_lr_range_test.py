@@ -59,7 +59,7 @@ optname = args.optimizer if len(sys.argv)>=2 else 'sgd'
 def lrs(batch):
     low = 1e-5
     high = 10
-    return low + (high - low) * batch / len(train_loader) / args.epochs
+    return 2**(low+(high-low)*batch/len(train_loader)/args.num_epoch)
 
 lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer,lrs)
 
@@ -96,6 +96,7 @@ def train(train_loader, model, criterion, optimizer, device, scheduler):
     return model, optimizer, epoch_loss
 
 for i in range(args.epochs):
+    print(i)
     train(train_loader,model,criterion,optimizer,'cuda',lr_scheduler)
 
 with open('mnist_lenet_batchsize32_'+args.optimizer+'.json','w+') as f:
