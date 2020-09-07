@@ -20,7 +20,7 @@ parser.add_argument('-g', '--gpus', default=1, type=int,
                     help='number of gpus per node')
 parser.add_argument('-nr', '--nr', default=0, type=int,
                     help='ranking within the nodes')
-parser.add_argument('--epochs', default=2, type=int,
+parser.add_argument('--epochs', default=30, type=int,
                     metavar='N',
                     help='number of total epochs to run')
 parser.add_argument('-p','--optimizer',default='sgd',type=str,
@@ -58,7 +58,7 @@ optname = args.optimizer if len(sys.argv)>=2 else 'sgd'
 criterion = nn.CrossEntropyLoss()
 
 lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.lr,steps_per_epoch=len(train_loader),
-                                                   epochs=args.epochs)
+                                                   epochs=N_EPOCHS)
 
 model, optimizer, _ = training_loop(model, criterion, optimizer, train_loader, valid_loader, N_EPOCHS, DEVICE,lr_scheduler)
 
