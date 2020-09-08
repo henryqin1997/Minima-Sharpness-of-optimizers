@@ -145,11 +145,18 @@ def test_on_train(epoch,dataloader):
                          % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
 if args.trainset:
     res,reseps,resori,original_loss = cal_sharpness(net,trainloader,criterion,[5e-4,2e-4,1e-4,5e-5,1e-5,1e-6,-1e-6,-1e-5,-5e-5,-2e-4,-1e-4,-5e-4])
+    if not args.lb:
+        json.dump([res, reseps, resori, original_loss, checkpoint['acc']],
+                  open('trainset_sharpness_measure_{}_{}.json'.format(args.optimizer, args.max_lr), 'w+'))
+    else:
+        json.dump([res, reseps, resori, original_loss, checkpoint['acc']],
+                  open('trainset_sharpness_measure_lb_{}_{}.json'.format(args.optimizer, args.max_lr), 'w+'))
+
 else:
     res, reseps, resori, original_loss = cal_sharpness(net, testloader, criterion,
                                                        [5e-4, 2e-4, 1e-4, 5e-5, 1e-5, 1e-6, -1e-6, -1e-5, -5e-5, -2e-4,
                                                         -1e-4, -5e-4])
-if not args.lb:
-    json.dump([res,reseps,resori,original_loss,checkpoint['acc']],open('trainset_sharpness_measure_{}_{}.json'.format(args.optimizer,args.max_lr),'w+'))
-else:
-    json.dump([res, reseps, resori,original_loss,checkpoint['acc']], open('trainset_sharpness_measure_lb_{}_{}.json'.format(args.optimizer, args.max_lr), 'w+'))
+    if not args.lb:
+        json.dump([res,reseps,resori,original_loss,checkpoint['acc']],open('sharpness_measure_{}_{}.json'.format(args.optimizer,args.max_lr),'w+'))
+    else:
+        json.dump([res, reseps, resori,original_loss,checkpoint['acc']], open('sharpness_measure_lb_{}_{}.json'.format(args.optimizer, args.max_lr), 'w+'))
