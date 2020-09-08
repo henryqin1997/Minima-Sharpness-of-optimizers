@@ -40,6 +40,8 @@ parser.add_argument('--optimizer',type=str,default='sgd',
                     help='different optimizers')
 parser.add_argument('--lb',action='store_true',
                     help='resume form lb checkpoint')
+parser.add_argument('--trainset',action='store_true',default=False)
+
 
 
 parser.add_argument('--max-lr',default=0.1,type=float)
@@ -141,8 +143,12 @@ def test_on_train(epoch,dataloader):
 
             progress_bar(batch_idx, len(dataloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                          % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
-
-res,reseps,resori,original_loss = cal_sharpness(net,trainloader,criterion,[5e-4,2e-4,1e-4,5e-5,1e-5,1e-6,-1e-6,-1e-5,-5e-5,-2e-4,-1e-4,-5e-4])
+if args.trainset:
+    res,reseps,resori,original_loss = cal_sharpness(net,trainloader,criterion,[5e-4,2e-4,1e-4,5e-5,1e-5,1e-6,-1e-6,-1e-5,-5e-5,-2e-4,-1e-4,-5e-4])
+else:
+    res, reseps, resori, original_loss = cal_sharpness(net, testloader, criterion,
+                                                       [5e-4, 2e-4, 1e-4, 5e-5, 1e-5, 1e-6, -1e-6, -1e-5, -5e-5, -2e-4,
+                                                        -1e-4, -5e-4])
 if not args.lb:
     json.dump([res,reseps,resori,original_loss,checkpoint['acc']],open('trainset_sharpness_measure_{}_{}.json'.format(args.optimizer,args.max_lr),'w+'))
 else:
