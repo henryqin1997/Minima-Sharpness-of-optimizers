@@ -2,20 +2,20 @@ from matplotlib import pyplot as plt
 import glob
 import json
 import numpy as np
-names = ['lamb0.0008-0.02*','lars0.092-2.3*','novograd0.002-0.05*','radam0.0006-0.015*']
-
-for name in names[2:3]:
-    fn = glob.glob('./onecyclelog/'+name)
-    valid_list = []
-    for f in fn:
-        train_acc,valid_acc = json.load(open(f,'r'))
-        # valid_list.append(valid_acc)
-        plt.plot(train_acc)
-        plt.title(name)
-        plt.show()
-        plt.plot(valid_acc)
-        plt.title(name)
-        plt.show()
+# names = ['lamb0.0008-0.02*','lars0.092-2.3*','novograd0.002-0.05*','radam0.0006-0.015*']
+#
+# for name in names[2:3]:
+#     fn = glob.glob('./onecyclelog/'+name)
+#     valid_list = []
+#     for f in fn:
+#         train_acc,valid_acc = json.load(open(f,'r'))
+#         # valid_list.append(valid_acc)
+#         plt.plot(train_acc)
+#         plt.title(name)
+#         plt.show()
+#         plt.plot(valid_acc)
+#         plt.title(name)
+#         plt.show()
     # valid_list = np.array(valid_list)
     # print(name)
     # print('max of max')
@@ -31,3 +31,10 @@ for name in names[2:3]:
     # plt.plot(np.average(valid_list,axis=0))
     # plt.title(name+'average of 5 run')
     # plt.show()
+
+tacc,vacc = json.load(open('onecyclelog/novograd0.002-0.05-2020-08-13_08-44-52_onecycle_log.json'))
+plt.plot(tacc,label='train accuracy')
+plt.plot(vacc,label='valid accuracy')
+plt.title('NovoGrad travel through sharp testset minima')
+plt.legend()
+plt.show()

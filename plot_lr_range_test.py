@@ -20,21 +20,21 @@ log_neg_three = -9.965784284662087
 
 name_list = ['sgd','sgdwm','rmsprop','adagrad','adam','radam','lars','lamb','novograd']
 
-
+title_list = ['SGD','SGDM','RMSProp','AdaGrad','Adam','RAdam','LARS','LAMB','NovoGrad']
 
 # original curve large batch
-for opt in name_list[6:7]:
+for opt in name_list[7:8]:
     # trainloss = json.load(open('lr_range_test_data/'+opt+'_lr_range_find_minibatch.json'))
-    trainloss = json.load(open(opt+'_batchsize_8192_lr_range_find_minibatch.json'))
-    x = [2**(low+(high-low)*i/len(trainloss)) for i in range(int(len(trainloss)*(0-low)/(high-low)))]
-    y = trainloss[:int(len(trainloss)*(0-low)/(high-low))]
+    trainloss = json.load(open('lbonecyclelog/'+opt+'_batchsize_8192_lr_range_find_minibatch.json'))
+    x = [2**(low+(high-low)*i/len(trainloss)) for i in range(int(len(trainloss)*(log_neg_one+1-low)/(high-low)))]
+    y = trainloss[:int(len(trainloss)*(log_neg_one+1-low)/(high-low))]
     i = trainloss.index(min(trainloss))
     print(i, 2 ** (low + (high - low) * i / len(trainloss)))
     plt.plot(x,y)
     plt.xscale('log')
     plt.xlabel('learning rate')
     plt.ylabel('loss')
-    plt.title(opt+'_lr_range_test')
+    plt.title('LAMB Lr Range Test')
     plt.show()
 
 #original curve

@@ -142,7 +142,7 @@ def test_on_train(epoch,dataloader):
             progress_bar(batch_idx, len(dataloader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
                          % (test_loss / (batch_idx + 1), 100. * correct / total, correct, total))
 
-res,reseps,resori,original_loss = cal_sharpness(net,testloader,criterion,[5e-4,2e-4,1e-4,5e-5,1e-5,1e-6,-1e-6,-1e-5,-5e-5,-2e-4,-1e-4,-5e-4])
+res,reseps,resori,original_loss = cal_sharpness(net,trainloader,criterion,[5e-4,2e-4,1e-4,5e-5,1e-5,1e-6,-1e-6,-1e-5,-5e-5,-2e-4,-1e-4,-5e-4])
 if not args.lb:
     json.dump([res,reseps,resori,original_loss,checkpoint['acc']],open('sharpness_measure_{}_{}.json'.format(args.optimizer,args.max_lr),'w+'))
 else:

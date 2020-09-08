@@ -122,9 +122,9 @@ else:
                           weight_decay=args.weight_decay)
 # lrs = create_lr_scheduler(args.warmup_epochs, args.lr_decay)
 # lr_scheduler = LambdaLR(optimizer,lrs)
-lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, args.lr_decay, gamma=0.25)
-#lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.max_lr,steps_per_epoch=len(trainloader), anneal_strategy = 'linear',
-#                                                   epochs=150,div_factor=args.div_factor,final_div_factor=args.final_div, pct_start = 0.1)
+#lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, args.lr_decay, gamma=0.25)
+lr_scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,args.max_lr,steps_per_epoch=len(trainloader),
+                                                  epochs=150,div_factor=args.div_factor,final_div_factor=args.final_div)
 train_acc = []
 valid_acc = []
 
@@ -137,12 +137,13 @@ def train(epoch):
         lr_list.append(lr_scheduler.get_last_lr())
 
 for epoch in range(150):
-    #train(epoch)
-    lr_scheduler.step()
-    lr_list.append(lr_scheduler.get_last_lr())
+    train(epoch)
+    # lr_scheduler.step()
+    # lr_list.append(lr_scheduler.get_last_lr())
 
 plt.plot(lr_list)
-plt.title('Multistep')
-plt.xlabel('epoch')
+# plt.title('Multistep')
+plt.title('One Cycle LR Scheduling')
+plt.xlabel('batch iteration')
 plt.ylabel('learning_rate')
 plt.show()
